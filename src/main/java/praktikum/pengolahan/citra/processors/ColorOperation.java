@@ -1,8 +1,8 @@
-package praktikum.pengolahan.citra.processor;
+package praktikum.pengolahan.citra.processors;
 
 import praktikum.pengolahan.citra.contracts.PerformOperationsTo;
 
-public class ColorOperations {
+public class ColorOperation {
 
 
   public static void performOperationsTo(int[][][] colors, PerformOperationsTo performOperationsTo) {

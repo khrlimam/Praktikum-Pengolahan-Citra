@@ -2,8 +2,9 @@ package praktikum.pengolahan.citra.controllers;
 
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Bounds;
+import javafx.scene.chart.BarChart;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -16,12 +17,14 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import praktikum.pengolahan.citra.utils.Constants;
+import javafx.stage.Stage;
 import praktikum.pengolahan.citra.contracts.ApplyEffect;
-import praktikum.pengolahan.citra.contracts.UpdateUI;
-import praktikum.pengolahan.citra.processor.Effects;
-import praktikum.pengolahan.citra.processor.ImageProcessor;
-import praktikum.pengolahan.citra.runnables.ImageToNDArray;
+import praktikum.pengolahan.citra.contracts.ExecutionDetail;
+import praktikum.pengolahan.citra.contracts.ReactTo;
+import praktikum.pengolahan.citra.handleres.ImageToNDArray;
+import praktikum.pengolahan.citra.handleres.RealImageCoordinat;
+import praktikum.pengolahan.citra.processors.Effects;
+import praktikum.pengolahan.citra.utils.Constants;
 import praktikum.pengolahan.citra.utils.FileUtils;
 import praktikum.pengolahan.citra.utils.Utils;
 
@@ -34,6 +37,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
+
+import static praktikum.pengolahan.citra.processors.ImageProcessor.colorsToImage;
 
 
 public class MainController implements Initializable, EventHandler<MouseEvent> {
@@ -65,7 +70,10 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
       ivBlackWhiteEffect,
       ivBrightnessEffect;
 
+  private Stage histogramStage;
+  private Histogram histogramController;
   private Image originalImage;
+  private int[][][] originalColors;
   private boolean ifPictureExists;
   private List<ImageView> effectThumbs = new ArrayList<>();
   private HashMap<String, ApplyEffect> effects = new HashMap<>();
@@ -74,38 +82,15 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
 
   public void initialize(URL location, ResourceBundle resources) {
     lblTitle.setText(Constants.APP_NAME);
+    initHistogram();
     initEffects();
     setDefaultImage();
   }
 
-  private EventHandler<? super MouseEvent> onMouseMoved() {
-    return event -> {
-      double x = event.getX();
-      double y = event.getY();
-      Image imageFileToEdit = ivImageToEdit.getImage();
-
-      Bounds bounds = ivImageToEdit.getLayoutBounds();
-      double xScale = bounds.getWidth() / imageFileToEdit.getWidth();
-      double yScale = bounds.getHeight() / imageFileToEdit.getHeight();
-
-      x /= xScale;
-      y /= yScale;
-
-      int xCord = (int) x;
-      int yCord = (int) y;
-      ivImageToEdit.getX();
-
-      PixelReader pixelReader = imageFileToEdit.getPixelReader();
-      Color color = pixelReader.getColor(xCord, yCord);
-      String coordinat = String.format("(%d, %d)", xCord, yCord);
-      lblCoordinat.setText(coordinat);
-      int red = (int) (color.getRed() * 255);
-      int green = (int) (color.getGreen() * 255);
-      int blue = (int) (color.getBlue() * 255);
-      String hexColor = String.format("#%s%s%s", Integer.toHexString(red), Integer.toHexString(green), Integer.toHexString(blue));
-      String backgroundColor = String.format("-fx-background-color: %s", hexColor);
-      pColor.setStyle(backgroundColor);
-    };
+  private void initHistogram() {
+    FXMLLoader histogramFXMLLoader = Utils.loader(Utils.getUiResource("histogram.fxml"));
+    histogramStage = Utils.makeDialogStage(histogramFXMLLoader, "Histogram", null);
+    histogramController = histogramFXMLLoader.getController();
   }
 
   private void registerEffects(ImageView thumbnail, ApplyEffect effectToApply) {
@@ -129,8 +114,7 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
   private void applyGray() {
     int[][][] imageToColors = imageToNDArray.getImageToColors();
     int[][][] grayScaledColors = Effects.grayScale(imageToColors);
-    Image grayScaledColors_toImage = ImageProcessor.colorsToImage(grayScaledColors);
-    ivImageToEdit.setImage(grayScaledColors_toImage);
+    ivImageToEdit.setImage(colorsToImage(grayScaledColors));
   }
 
   private void applyContrast() {
@@ -149,22 +133,20 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
     hbEffectContainer.setVisible(ifPictureExists);
     pImagePropertiesContainer.setVisible(ifPictureExists);
     if (ifPictureExists) {
-      ivImageToEdit.setOnMouseMoved(onMouseMoved());
+      ivImageToEdit.setOnMouseMoved(event -> RealImageCoordinat.getRealCoordinat(event, reactTo()));
     }
   }
-
 
   @FXML
   private void choosePicture() {
     File file = FileUtils.showChoseImageFileDialog();
-    if (file != null)
-      showWaitContainer();
     setIvImages(file);
     ifPictureExists = true;
     toggleEffectContainer();
-    imageToNDArray = new ImageToNDArray(file, hideWaitContainer());
+    imageToNDArray = new ImageToNDArray(file, freezeBeforeExecutedStoreColorAfterExecuted());
     thread = new Thread(imageToNDArray);
-    thread.start();
+    if (file != null)
+      thread.start();
   }
 
   @FXML
@@ -176,20 +158,20 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
 
   @FXML
   private void onDragDropped(DragEvent event) {
-    showWaitContainer();
     Dragboard dragboard = event.getDragboard();
     File firstDraggedFile = dragboard.getFiles().get(0);
     setIvImages(firstDraggedFile);
     ifPictureExists = true;
     toggleEffectContainer();
-    imageToNDArray = new ImageToNDArray(firstDraggedFile, hideWaitContainer());
+    imageToNDArray = new ImageToNDArray(firstDraggedFile, freezeBeforeExecutedStoreColorAfterExecuted());
     thread = new Thread(imageToNDArray);
     thread.start();
   }
 
   @FXML
   private void showHistogram() {
-    System.out.println("Showing histogram");
+    histogramStage.show();
+    BarChart<Number, Number> chart = histogramController.getBcHistogram();
   }
 
   @FXML
@@ -246,13 +228,34 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
     effects.get(id).apply();
   }
 
-  private void showWaitContainer() {
-    apWaitContainer.setVisible(true);
+  private ReactTo reactTo() {
+    return (x, y) -> {
+      Image imageSource = ivImageToEdit.getImage();
+      PixelReader pixelReader = imageSource.getPixelReader();
+      Color color = pixelReader.getColor(x, y);
+      String coordinat = String.format("(%d, %d)", x, y);
+      lblCoordinat.setText(coordinat);
+      int red = (int) (color.getRed() * 255);
+      int green = (int) (color.getGreen() * 255);
+      int blue = (int) (color.getBlue() * 255);
+      String hexColor = String.format("#%s%s%s", Integer.toHexString(red), Integer.toHexString(green), Integer.toHexString(blue));
+      String backgroundColor = String.format("-fx-background-color: %s", hexColor);
+      pColor.setStyle(backgroundColor);
+    };
   }
 
-  private UpdateUI hideWaitContainer() {
-    return () -> {
-      apWaitContainer.setVisible(false);
+  private ExecutionDetail freezeBeforeExecutedStoreColorAfterExecuted() {
+    return new ExecutionDetail() {
+      @Override
+      public void preExecution() {
+        apWaitContainer.setVisible(true);
+      }
+
+      @Override
+      public void postExecution() {
+        originalColors = imageToNDArray.getImageToColors();
+        apWaitContainer.setVisible(false);
+      }
     };
   }
 }

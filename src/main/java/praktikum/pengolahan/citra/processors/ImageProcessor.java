@@ -1,4 +1,4 @@
-package praktikum.pengolahan.citra.processor;
+package praktikum.pengolahan.citra.processors;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelWriter;
@@ -38,20 +38,18 @@ public class ImageProcessor {
   }
 
   public static Image colorsToImage(int[][][] colors) {
-    int width = colors[0].length;
-    int height = colors.length;
+    int width = ColorOperation.getWidth(colors);
+    int height = ColorOperation.getHeight(colors);
     WritableImage writableImage = new WritableImage(width, height);
     PixelWriter pixelWriter = writableImage.getPixelWriter();
-    for (int row = 0; row < height; row++) {
-      for (int column = 0; column < width; column++) {
-        Color color = new Color(
-            ColorOperations.getRed(colors, row, column) / 255d,
-            ColorOperations.getGreen(colors, row, column) / 255d,
-            ColorOperations.getBlue(colors, row, column) / 255d,
-            ColorOperations.getAlpha(colors, row, column));
-        pixelWriter.setColor(column, row, color);
-      }
-    }
+    ColorOperation.performOperationsTo(colors, ((row, column) -> {
+      Color color = new Color(
+          ColorOperation.getRed(colors, row, column) / 255d,
+          ColorOperation.getGreen(colors, row, column) / 255d,
+          ColorOperation.getBlue(colors, row, column) / 255d,
+          ColorOperation.getAlpha(colors, row, column));
+      pixelWriter.setColor(column, row, color);
+    }));
     return writableImage;
   }
 }
