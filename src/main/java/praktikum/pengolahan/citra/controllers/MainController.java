@@ -97,7 +97,7 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
 
   private void initEffects() {
     registerEffects(ivOriginal, () -> applyOriginal());
-    registerEffects(ivGreyEffect, () -> applyGrey());
+    registerEffects(ivGreyEffect, () -> applyGray());
     registerEffects(ivContrastEffect, () -> applyContrast());
     registerEffects(ivBlackWhiteEffect, () -> applyBlackWhite());
     registerEffects(ivBrightnessEffect, () -> applyBrightness());
@@ -107,7 +107,7 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
     ivImageToEdit.setImage(imageFileToEdit);
   }
 
-  private void applyGrey() {
+  private void applyGray() {
     int[][][] imageToColors = imageToNDArray.getImageToColors();
     int[][][] grayScaledColors = Effects.grayScale(imageToColors);
     Image grayScaledColors_toImage = ImageProcessor.colorsToImage(grayScaledColors);
