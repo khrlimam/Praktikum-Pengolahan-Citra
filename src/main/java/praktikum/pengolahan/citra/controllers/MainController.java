@@ -16,7 +16,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import praktikum.pengolahan.citra.Statics;
+import praktikum.pengolahan.citra.utils.Constants;
 import praktikum.pengolahan.citra.contracts.ApplyEffect;
 import praktikum.pengolahan.citra.contracts.UpdateUI;
 import praktikum.pengolahan.citra.processor.Effects;
@@ -73,7 +73,7 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
   private ImageToNDArray imageToNDArray;
 
   public void initialize(URL location, ResourceBundle resources) {
-    lblTitle.setText(Statics.APP_NAME);
+    lblTitle.setText(Constants.APP_NAME);
     initEffects();
     setDefaultImage();
   }
@@ -221,8 +221,8 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
   private void setThumbnailEffectImage(File imageFile) {
     try {
       Image image = new Image(new FileInputStream(imageFile),
-          Statics.THUMBNAIL_EFFECT_WIDTH,
-          Statics.THUMBNAIL_EFFECT_HEIGHT,
+          Constants.THUMBNAIL_EFFECT_WIDTH,
+          Constants.THUMBNAIL_EFFECT_HEIGHT,
           false,
           false);
 

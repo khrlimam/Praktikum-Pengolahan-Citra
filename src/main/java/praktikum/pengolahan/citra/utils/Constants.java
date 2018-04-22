@@ -1,6 +1,6 @@
-package praktikum.pengolahan.citra;
+package praktikum.pengolahan.citra.utils;
 
-public class Statics {
+public class Constants {
   public static final String APP_NAME = "Praktikum Pengolahan Citra";
   public static final String IMAGE_CHOOSER_DIALOG_TITLE = "Pilih Gambar";
   public static final int THUMBNAIL_EFFECT_WIDTH = 80;

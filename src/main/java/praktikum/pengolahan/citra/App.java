@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import praktikum.pengolahan.citra.utils.Constants;
 import praktikum.pengolahan.citra.utils.Utils;
 
 public class App extends Application {
@@ -16,7 +17,7 @@ public class App extends Application {
   public void start(Stage primaryStage) throws Exception {
     APP_STAGE = primaryStage;
     Parent root = FXMLLoader.load(Utils.getUiResource(MAIN_LAYOUT));
-    primaryStage.setTitle(Statics.APP_NAME);
+    primaryStage.setTitle(Constants.APP_NAME);
     primaryStage.setScene(new Scene(root));
     primaryStage.setMinHeight(630d);
     primaryStage.setMinWidth(800d);
