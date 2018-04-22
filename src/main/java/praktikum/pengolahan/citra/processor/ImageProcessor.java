@@ -4,7 +4,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
-import praktikum.pengolahan.citra.utils.ColorOperations;
 
 import java.io.File;
 import java.io.FileInputStream;

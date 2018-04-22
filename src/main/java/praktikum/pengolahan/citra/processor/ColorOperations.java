@@ -1,4 +1,4 @@
-package praktikum.pengolahan.citra.utils;
+package praktikum.pengolahan.citra.processor;
 
 import praktikum.pengolahan.citra.contracts.PerformOperationsTo;
 

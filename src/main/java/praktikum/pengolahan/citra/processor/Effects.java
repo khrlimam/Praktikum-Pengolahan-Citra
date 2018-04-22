@@ -2,7 +2,7 @@ package praktikum.pengolahan.citra.processor;
 
 import javafx.scene.image.Image;
 
-import static praktikum.pengolahan.citra.utils.ColorOperations.*;
+import static praktikum.pengolahan.citra.processor.ColorOperations.*;
 
 public class Effects {
 
