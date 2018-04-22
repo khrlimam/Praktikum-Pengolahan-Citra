@@ -3,6 +3,7 @@ package praktikum.pengolahan.citra.controllers;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Bounds;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -38,10 +39,16 @@ import java.util.ResourceBundle;
 public class MainController implements Initializable, EventHandler<MouseEvent> {
 
   @FXML
-  Label lblTitle, lblWait, lblResolution, lblCoordinat;
+  Label
+      lblTitle,
+      lblWait,
+      lblResolution,
+      lblCoordinat;
 
   @FXML
-  HBox hbEffectContainer, pImagePropertiesContainer;
+  HBox
+      hbEffectContainer,
+      pImagePropertiesContainer;
 
   @FXML
   AnchorPane apWaitContainer;
@@ -58,8 +65,7 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
       ivBlackWhiteEffect,
       ivBrightnessEffect;
 
-  private Image imageFileToEdit;
-  private File editedImageFile;
+  private Image originalImage;
   private boolean ifPictureExists;
   private List<ImageView> effectThumbs = new ArrayList<>();
   private HashMap<String, ApplyEffect> effects = new HashMap<>();
@@ -74,11 +80,24 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
 
   private EventHandler<? super MouseEvent> onMouseMoved() {
     return event -> {
+      double x = event.getX();
+      double y = event.getY();
+      Image imageFileToEdit = ivImageToEdit.getImage();
+
+      Bounds bounds = ivImageToEdit.getLayoutBounds();
+      double xScale = bounds.getWidth() / imageFileToEdit.getWidth();
+      double yScale = bounds.getHeight() / imageFileToEdit.getHeight();
+
+      x /= xScale;
+      y /= yScale;
+
+      int xCord = (int) x;
+      int yCord = (int) y;
+      ivImageToEdit.getX();
+
       PixelReader pixelReader = imageFileToEdit.getPixelReader();
-      int x = (int) event.getX();
-      int y = (int) event.getY();
-      Color color = pixelReader.getColor(x, y);
-      String coordinat = String.format("(%d, %d)", x, y);
+      Color color = pixelReader.getColor(xCord, yCord);
+      String coordinat = String.format("(%d, %d)", xCord, yCord);
       lblCoordinat.setText(coordinat);
       int red = (int) (color.getRed() * 255);
       int green = (int) (color.getGreen() * 255);
@@ -104,7 +123,7 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
   }
 
   private void applyOriginal() {
-    ivImageToEdit.setImage(imageFileToEdit);
+    ivImageToEdit.setImage(originalImage);
   }
 
   private void applyGray() {
@@ -138,7 +157,8 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
   @FXML
   private void choosePicture() {
     File file = FileUtils.showChoseImageFileDialog();
-    showWaitContainer();
+    if (file != null)
+      showWaitContainer();
     setIvImages(file);
     ifPictureExists = true;
     toggleEffectContainer();
@@ -167,6 +187,16 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
     thread.start();
   }
 
+  @FXML
+  private void showHistogram() {
+    System.out.println("Showing histogram");
+  }
+
+  @FXML
+  private void saveEditedImage() {
+    System.out.println("Saving image");
+  }
+
   private void setIvImages(File imageFile) {
     setIvImageToEditImage(imageFile);
     setThumbnailEffectImage(imageFile);
@@ -174,14 +204,18 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
 
   private void setIvImageToEditImage(File imageFile) {
     try {
-      imageFileToEdit = new Image(new FileInputStream(imageFile));
-      String width = String.format("%spx", String.valueOf((int) imageFileToEdit.getWidth()));
-      String height = String.format("%spx", String.valueOf((int) imageFileToEdit.getHeight()));
-      lblResolution.setText(String.format("%s%s", width, height));
-      ivImageToEdit.setImage(imageFileToEdit);
+      originalImage = new Image(new FileInputStream(imageFile));
+      ivImageToEdit.setImage(originalImage);
+      showImageResolution();
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
+  }
+
+  private void showImageResolution() {
+    String width = String.format("%spx", String.valueOf((int) originalImage.getWidth()));
+    String height = String.format("%spx", String.valueOf((int) originalImage.getHeight()));
+    lblResolution.setText(String.format("%s%s", width, height));
   }
 
   private void setThumbnailEffectImage(File imageFile) {
@@ -191,6 +225,7 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
           Statics.THUMBNAIL_EFFECT_HEIGHT,
           false,
           false);
+
       effectThumbs.forEach(imageView -> imageView.setImage(image));
     } catch (FileNotFoundException e) {
       e.printStackTrace();
@@ -220,5 +255,4 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
       apWaitContainer.setVisible(false);
     };
   }
-
 }

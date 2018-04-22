@@ -12,14 +12,7 @@ import java.io.FileNotFoundException;
 
 public class ImageProcessor {
 
-  public static int[][][] imageToColors(File imageFile) {
-    Image image = null;
-    try {
-      image = new Image(new FileInputStream(imageFile));
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    }
-
+  public static int[][][] imageToColors(Image image) {
     int[][][] colors = new int[(int) image.getHeight()][(int) image.getWidth()][4];
     for (int y = 0; y < image.getHeight(); y++) {
       for (int x = 0; x < image.getWidth(); x++) {
@@ -33,6 +26,16 @@ public class ImageProcessor {
       }
     }
     return colors;
+  }
+
+  public static int[][][] imageToColors(File imageFile) {
+    try {
+      Image image = new Image(new FileInputStream(imageFile));
+      return imageToColors(image);
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 
   public static Image colorsToImage(int[][][] colors) {

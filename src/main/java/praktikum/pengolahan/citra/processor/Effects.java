@@ -1,5 +1,7 @@
 package praktikum.pengolahan.citra.processor;
 
+import javafx.scene.image.Image;
+
 import static praktikum.pengolahan.citra.utils.ColorOperations.*;
 
 public class Effects {
@@ -28,5 +30,13 @@ public class Effects {
     });
     return colors;
   }
+
+  public static Image grayScale(Image inputImage) {
+    int[][][] colors = ImageProcessor.imageToColors(inputImage);
+    int[][][] grayScaled = grayScale(colors);
+    Image newImage = ImageProcessor.colorsToImage(grayScaled);
+    return newImage;
+  }
+
 
 }

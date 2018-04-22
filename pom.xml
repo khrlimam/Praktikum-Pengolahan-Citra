@@ -57,17 +57,5 @@
   </properties>
 
   <dependencies>
-    <dependency>
-      <!--ND4J Backend-->
-      <groupId>org.nd4j</groupId>
-      <artifactId>nd4j-native-platform</artifactId>
-      <version>${nd4j.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.bytedeco</groupId>
-      <artifactId>javacpp</artifactId>
-      <version>1.4.1</version>
-    </dependency>
   </dependencies>
 </project>
