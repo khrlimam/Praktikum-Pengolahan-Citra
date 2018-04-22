@@ -2,11 +2,12 @@
 
 ## Quick Analysis
  - Histogram
- - Resolution
- - Pixel position when hovered
+ - Resolution (**done**)
+ - Pixel position when hovered (**done**)
+ - Show color on hovered coordinat (**done**)
 
 ## Image Effects
- - Grey
+ - Grey (**done**)  
  - Contrast enhancement
  - Black & White
  - Brightness enhancement

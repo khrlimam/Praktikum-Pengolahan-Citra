@@ -34,8 +34,7 @@ public class Effects {
   public static Image grayScale(Image inputImage) {
     int[][][] colors = ImageProcessor.imageToColors(inputImage);
     int[][][] grayScaled = grayScale(colors);
-    Image newImage = ImageProcessor.colorsToImage(grayScaled);
-    return newImage;
+    return ImageProcessor.colorsToImage(grayScaled);
   }
 
 
