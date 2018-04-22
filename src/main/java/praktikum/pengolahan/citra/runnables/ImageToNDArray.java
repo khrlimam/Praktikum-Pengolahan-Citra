@@ -8,7 +8,7 @@ import java.io.File;
 
 public class ImageToNDArray implements Runnable {
   private File file;
-  private int[][][] img;
+  private int[][][] imageToColors;
   private UpdateUI updateUI;
 
   public ImageToNDArray(File file) {
@@ -20,13 +20,13 @@ public class ImageToNDArray implements Runnable {
     this.updateUI = updateUI;
   }
 
-  public int[][][] getImg() {
-    return img;
+  public int[][][] getImageToColors() {
+    return imageToColors;
   }
 
   @Override
   public void run() {
-    this.img = ImageProcessor.imgToColorMapped(this.file);
+    this.imageToColors = ImageProcessor.imageToColors(this.file);
     if (updateUI != null) updateUI.update();
   }
 }

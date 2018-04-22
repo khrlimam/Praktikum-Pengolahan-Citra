@@ -1,7 +1,10 @@
 package praktikum.pengolahan.citra.processor;
 
 import javafx.scene.image.Image;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
+import praktikum.pengolahan.citra.utils.ColorOperations;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,7 +12,7 @@ import java.io.FileNotFoundException;
 
 public class ImageProcessor {
 
-  public static int[][][] imgToColorMapped(File imageFile) {
+  public static int[][][] imageToColors(File imageFile) {
     Image image = null;
     try {
       image = new Image(new FileInputStream(imageFile));
@@ -21,6 +24,7 @@ public class ImageProcessor {
     for (int y = 0; y < image.getHeight(); y++) {
       for (int x = 0; x < image.getWidth(); x++) {
         Color color = image.getPixelReader().getColor(x, y);
+        color.grayscale();
         colors[y][x] = new int[]{
             (int) (color.getRed() * 255),
             (int) (color.getGreen() * 255),
@@ -31,24 +35,21 @@ public class ImageProcessor {
     return colors;
   }
 
-  public static int[][][] addContrast(int beta, int[][][] color) {
-    int width = color[0].length;
-    int height = color.length;
-    for (int i = 0; i < height; i++) {
-      for (int j = 0; j < width; j++) {
-        int red = color[i][j][0];
-        color[i][j][0] = (red + beta) & 255;
-        int green = color[i][j][1];
-        color[i][j][1] = (green + beta) & 255;
-        int blue = color[i][j][2];
-        color[i][j][2] = (blue + beta) & 255;
+  public static Image colorsToImage(int[][][] colors) {
+    int width = colors[0].length;
+    int height = colors.length;
+    WritableImage writableImage = new WritableImage(width, height);
+    PixelWriter pixelWriter = writableImage.getPixelWriter();
+    for (int row = 0; row < height; row++) {
+      for (int column = 0; column < width; column++) {
+        Color color = new Color(
+            ColorOperations.getRed(colors, row, column) / 255d,
+            ColorOperations.getGreen(colors, row, column) / 255d,
+            ColorOperations.getBlue(colors, row, column) / 255d,
+            ColorOperations.getAlpha(colors, row, column));
+        pixelWriter.setColor(column, row, color);
       }
     }
-    return color;
+    return writableImage;
   }
-
-  public static File colorMappedToImageFile(double[][][] colors) {
-    return new File("./mantap.jpg");
-  }
-
 }

@@ -6,16 +6,19 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.PixelWriter;
-import javafx.scene.image.WritableImage;
+import javafx.scene.image.PixelReader;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import praktikum.pengolahan.citra.Statics;
 import praktikum.pengolahan.citra.contracts.ApplyEffect;
+import praktikum.pengolahan.citra.contracts.UpdateUI;
+import praktikum.pengolahan.citra.processor.Effects;
 import praktikum.pengolahan.citra.processor.ImageProcessor;
 import praktikum.pengolahan.citra.runnables.ImageToNDArray;
 import praktikum.pengolahan.citra.utils.FileUtils;
@@ -35,20 +38,27 @@ import java.util.ResourceBundle;
 public class MainController implements Initializable, EventHandler<MouseEvent> {
 
   @FXML
-  Label lblTitle;
+  Label lblTitle, lblWait, lblResolution, lblCoordinat;
 
   @FXML
-  HBox hbEffectContainer;
+  HBox hbEffectContainer, pImagePropertiesContainer;
+
+  @FXML
+  AnchorPane apWaitContainer;
+
+  @FXML
+  Pane pColor;
 
   @FXML
   ImageView
       ivImageToEdit,
+      ivOriginal,
       ivGreyEffect,
       ivContrastEffect,
       ivBlackWhiteEffect,
       ivBrightnessEffect;
 
-  private File imageFileToEdit;
+  private Image imageFileToEdit;
   private File editedImageFile;
   private boolean ifPictureExists;
   private List<ImageView> effectThumbs = new ArrayList<>();
@@ -60,51 +70,48 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
     lblTitle.setText(Statics.APP_NAME);
     initEffects();
     setDefaultImage();
-    initEvent();
   }
 
-  private void appendEffect(ImageView thumbnail, ApplyEffect effectToApply) {
+  private EventHandler<? super MouseEvent> onMouseMoved() {
+    return event -> {
+      PixelReader pixelReader = imageFileToEdit.getPixelReader();
+      int x = (int) event.getX();
+      int y = (int) event.getY();
+      Color color = pixelReader.getColor(x, y);
+      String coordinat = String.format("(%d, %d)", x, y);
+      lblCoordinat.setText(coordinat);
+      int red = (int) (color.getRed() * 255);
+      int green = (int) (color.getGreen() * 255);
+      int blue = (int) (color.getBlue() * 255);
+      String hexColor = String.format("#%s%s%s", Integer.toHexString(red), Integer.toHexString(green), Integer.toHexString(blue));
+      String backgroundColor = String.format("-fx-background-color: %s", hexColor);
+      pColor.setStyle(backgroundColor);
+    };
+  }
+
+  private void registerEffects(ImageView thumbnail, ApplyEffect effectToApply) {
+    thumbnail.setOnMouseClicked(this);
     effectThumbs.add(thumbnail);
     effects.put(thumbnail.getId(), effectToApply);
   }
 
   private void initEffects() {
-    appendEffect(ivGreyEffect, () -> applyGrey());
-    appendEffect(ivContrastEffect, () -> applyContrast());
-    appendEffect(ivBlackWhiteEffect, () -> applyBlackWhite());
-    appendEffect(ivBrightnessEffect, () -> applyBrightness());
+    registerEffects(ivOriginal, () -> applyOriginal());
+    registerEffects(ivGreyEffect, () -> applyGrey());
+    registerEffects(ivContrastEffect, () -> applyContrast());
+    registerEffects(ivBlackWhiteEffect, () -> applyBlackWhite());
+    registerEffects(ivBrightnessEffect, () -> applyBrightness());
   }
 
-  private void initEvent() {
-    ivGreyEffect.setOnMouseClicked(this);
-    ivContrastEffect.setOnMouseClicked(this);
-    ivBlackWhiteEffect.setOnMouseClicked(this);
-    ivBrightnessEffect.setOnMouseClicked(this);
+  private void applyOriginal() {
+    ivImageToEdit.setImage(imageFileToEdit);
   }
 
   private void applyGrey() {
-    int[][][] img = imageToNDArray.getImg();
-    int width = (int) ivImageToEdit.getImage().getWidth();
-    int height = (int) ivImageToEdit.getImage().getHeight();
-
-    WritableImage writableImage = new WritableImage(width, height);
-    PixelWriter pixelWriter = writableImage.getPixelWriter();
-
-    int beta = 2;
-    int[][][] addedContrast = ImageProcessor.addContrast(beta, img);
-
-    for (int y = 0; y < height; y++) {
-      for (int x = 0; x < width; x++) {
-        Color color = new Color(
-            addedContrast[y][x][0] / 255d,
-            addedContrast[y][x][1] / 255d,
-            addedContrast[y][x][2] / 255d,
-            addedContrast[y][x][3]);
-        pixelWriter.setColor(x, y, color);
-      }
-      ivImageToEdit.setImage(writableImage);
-    }
-
+    int[][][] imageToColors = imageToNDArray.getImageToColors();
+    int[][][] grayScaledColors = Effects.grayScale(imageToColors);
+    Image grayScaledColors_toImage = ImageProcessor.colorsToImage(grayScaledColors);
+    ivImageToEdit.setImage(grayScaledColors_toImage);
   }
 
   private void applyContrast() {
@@ -121,18 +128,21 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
 
   private void toggleEffectContainer() {
     hbEffectContainer.setVisible(ifPictureExists);
+    pImagePropertiesContainer.setVisible(ifPictureExists);
+    if (ifPictureExists) {
+      ivImageToEdit.setOnMouseMoved(onMouseMoved());
+    }
   }
 
 
   @FXML
   private void choosePicture() {
     File file = FileUtils.showChoseImageFileDialog();
+    showWaitContainer();
     setIvImages(file);
     ifPictureExists = true;
     toggleEffectContainer();
-    imageToNDArray = new ImageToNDArray(file, () -> {
-      System.out.println("updating ui");
-    });
+    imageToNDArray = new ImageToNDArray(file, hideWaitContainer());
     thread = new Thread(imageToNDArray);
     thread.start();
   }
@@ -146,26 +156,29 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
 
   @FXML
   private void onDragDropped(DragEvent event) {
+    showWaitContainer();
     Dragboard dragboard = event.getDragboard();
     File firstDraggedFile = dragboard.getFiles().get(0);
     setIvImages(firstDraggedFile);
     ifPictureExists = true;
     toggleEffectContainer();
-    imageToNDArray = new ImageToNDArray(firstDraggedFile, () -> {
-      System.out.println("updating ui");
-    });
-//    imageToNDArray.setUpdateUI(() -> {
-//      System.out.println("Updating UI");
-//    });
+    imageToNDArray = new ImageToNDArray(firstDraggedFile, hideWaitContainer());
     thread = new Thread(imageToNDArray);
     thread.start();
   }
 
   private void setIvImages(File imageFile) {
-    this.imageFileToEdit = imageFile;
+    setIvImageToEditImage(imageFile);
+    setThumbnailEffectImage(imageFile);
+  }
+
+  private void setIvImageToEditImage(File imageFile) {
     try {
-      ivImageToEdit.setImage(new Image(new FileInputStream(imageFile)));
-      setThumbnailEffectImage(imageFile);
+      imageFileToEdit = new Image(new FileInputStream(imageFile));
+      String width = String.format("%spx", String.valueOf((int) imageFileToEdit.getWidth()));
+      String height = String.format("%spx", String.valueOf((int) imageFileToEdit.getHeight()));
+      lblResolution.setText(String.format("%s%s", width, height));
+      ivImageToEdit.setImage(imageFileToEdit);
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
@@ -196,6 +209,16 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
   public void handle(MouseEvent event) {
     String id = event.getPickResult().getIntersectedNode().getId();
     effects.get(id).apply();
+  }
+
+  private void showWaitContainer() {
+    apWaitContainer.setVisible(true);
+  }
+
+  private UpdateUI hideWaitContainer() {
+    return () -> {
+      apWaitContainer.setVisible(false);
+    };
   }
 
 }

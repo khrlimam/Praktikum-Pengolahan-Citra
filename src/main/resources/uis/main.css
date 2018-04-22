@@ -39,6 +39,10 @@
     -fx-background-color: rgba(0, 0, 0, .3);
 }
 
+.background-black-bold-transparent {
+    -fx-background-color: rgba(0, 0, 0, .7);
+}
+
 .effect-label {
     -fx-max-height: 30;
     -fx-min-height: 30;
@@ -56,6 +60,10 @@
     -fx-border-color: darkorange;
     -fx-border-style: solid;
     -fx-border-width: 5;
+}
+
+.label-bold {
+    -fx-font-weight: bold;
 }
 
 .header-text-primary {
