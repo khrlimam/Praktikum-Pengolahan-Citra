@@ -24,10 +24,6 @@ public class ImageToNDArray implements Runnable {
     return imageToColors;
   }
 
-  public void setImageToColors(int[][][] imageToColors) {
-    this.imageToColors = imageToColors;
-  }
-
   @Override
   public void run() {
     this.imageToColors = ImageProcessor.imageToColors(this.file);

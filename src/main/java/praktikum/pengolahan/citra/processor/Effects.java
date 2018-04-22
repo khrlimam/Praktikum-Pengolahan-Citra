@@ -18,17 +18,17 @@ public class Effects {
     return colors;
   }
 
-  public static int[][][] grayScale(int[][][] colors) {
-    performOperationsTo(colors, (row, column) -> {
-      int red = getRed(colors, row, column);
-      int green = getGreen(colors, row, column);
-      int blue = getBlue(colors, row, column);
+  public static int[][][] grayScale(int[][][] inputColors) {
+    performOperationsTo(inputColors, (row, column) -> {
+      int red = getRed(inputColors, row, column);
+      int green = getGreen(inputColors, row, column);
+      int blue = getBlue(inputColors, row, column);
       int newGrayScale = (red + green + blue) / 3;
-      setRed(colors, row, column, newGrayScale);
-      setGreen(colors, row, column, newGrayScale);
-      setBlue(colors, row, column, newGrayScale);
+      setRed(inputColors, row, column, newGrayScale);
+      setGreen(inputColors, row, column, newGrayScale);
+      setBlue(inputColors, row, column, newGrayScale);
     });
-    return colors;
+    return inputColors;
   }
 
   public static Image grayScale(Image inputImage) {
