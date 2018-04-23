@@ -25,16 +25,16 @@
           </children>
         </AnchorPane>
         <AnchorPane prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
-          <children>
-            <BarChart fx:id="bcHistogram" prefHeight="545.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-              <xAxis>
-                <CategoryAxis label="Grayscale" side="BOTTOM" />
-              </xAxis>
-              <yAxis>
-                <NumberAxis label="# Jumlah" side="LEFT" />
-              </yAxis>
-            </BarChart>
-          </children>
+               <children>
+                  <LineChart fx:id="chart" prefHeight="545.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <xAxis>
+                      <NumberAxis label="Bits" side="BOTTOM" fx:id="xAxis" />
+                    </xAxis>
+                    <yAxis>
+                      <NumberAxis fx:id="yAxis" label="# Count" side="LEFT" />
+                    </yAxis>
+                  </LineChart>
+               </children>
         </AnchorPane>
       </children>
     </VBox>

@@ -82,7 +82,6 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
 
   public void initialize(URL location, ResourceBundle resources) {
     lblTitle.setText(Constants.APP_NAME);
-    initHistogram();
     initEffects();
     setDefaultImage();
   }
@@ -170,8 +169,9 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
 
   @FXML
   private void showHistogram() {
+    histogramController.setColors(originalColors);
+    histogramController.populateChart();
     histogramStage.show();
-    BarChart<Number, Number> chart = histogramController.getBcHistogram();
   }
 
   @FXML
@@ -189,6 +189,7 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
       originalImage = new Image(new FileInputStream(imageFile));
       ivImageToEdit.setImage(originalImage);
       showImageResolution();
+      initHistogram();
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
