@@ -1,10 +1,10 @@
 package praktikum.pengolahan.citra.controllers;
 
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.chart.BarChart;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -170,8 +170,19 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
   @FXML
   private void showHistogram() {
     histogramController.setColors(originalColors);
-    histogramController.populateChart();
+    Thread thread = new Thread(new Runnable() {
+      @Override
+      public void run() {
+        Platform.runLater(new Runnable() {
+          @Override
+          public void run() {
+            histogramController.populateChart();
+          }
+        });
+      }
+    });
     histogramStage.show();
+    thread.start();
   }
 
   @FXML

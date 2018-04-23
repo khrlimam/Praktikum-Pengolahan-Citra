@@ -37,6 +37,9 @@ public class Histogram implements Initializable {
   }
 
   private ObservableList<XYChart.Series<Number, Number>> getData() {
+    System.out.println(getReds());
+    System.out.println(getGreens());
+    System.out.println(getBlues());
     XYChart.Series<Number, Number> redScaleCount = new XYChart.Series<>();
     XYChart.Series<Number, Number> greenScaleCount = new XYChart.Series<>();
     XYChart.Series<Number, Number> blueScaleCount = new XYChart.Series<>();
@@ -56,8 +59,6 @@ public class Histogram implements Initializable {
       XYChart.Data blueCount = new XYChart.Data(x, countBlue);
       blueCount.setNode(new HoveredLineChartNode(getPopup(x, countBlue)));
       redScaleCount.getData().add(blueCount);
-
-
     }
 
     data.addAll(redScaleCount, greenScaleCount, blueScaleCount);
@@ -81,13 +82,13 @@ public class Histogram implements Initializable {
 
   private List<Integer> getGreens() {
     List<Integer> greens = new ArrayList<>();
-    Arrays.stream(colors).forEach(ints -> Arrays.stream(ints).forEach(ints1 -> greens.add(ints1[0])));
+    Arrays.stream(colors).forEach(ints -> Arrays.stream(ints).forEach(ints1 -> greens.add(ints1[1])));
     return greens;
   }
 
   private List<Integer> getBlues() {
     List<Integer> blues = new ArrayList<>();
-    Arrays.stream(colors).forEach(ints -> Arrays.stream(ints).forEach(ints1 -> blues.add(ints1[0])));
+    Arrays.stream(colors).forEach(ints -> Arrays.stream(ints).forEach(ints1 -> blues.add(ints1[2])));
     return blues;
   }
 
