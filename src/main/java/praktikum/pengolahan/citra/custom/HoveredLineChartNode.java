@@ -1,33 +1,19 @@
 package praktikum.pengolahan.citra.custom;
 
-import javafx.geometry.Insets;
 import javafx.scene.Cursor;
-import javafx.scene.control.Label;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
+import praktikum.pengolahan.citra.contracts.LineNodeListener;
 
-public class HoveredLineChartNode extends StackPane {
-  public HoveredLineChartNode(String value) {
-    setPrefSize(10, 10);
-    final Label label = createDataThresholdLabel(value);
+public class HoveredLineChartNode extends Pane {
+  private LineNodeListener lineNodeListener;
 
+  public HoveredLineChartNode(LineNodeListener lineNodeListener) {
+    this.lineNodeListener = lineNodeListener;
     setOnMouseEntered(mouseEvent -> {
-      getChildren().setAll(label);
       setCursor(Cursor.CROSSHAIR);
-      toFront();
+      lineNodeListener.onMouseEntered();
     });
-
-    setOnMouseExited(mouseEvent -> getChildren().clear());
-
-    setMargin(label, new Insets(70, 0, 0, 0));
-  }
-
-  private Label createDataThresholdLabel(String value) {
-    final Label label = new Label(value);
-    label.getStyleClass().addAll("default-color0", "chart-line-symbol", "chart-series-line");
-    label.setStyle("-fx-font-size: 12; -fx-font-weight: bold; -fx-border-width: 1px");
-    label.setTextFill(Color.DARKGRAY);
-    label.setMinSize(Label.USE_PREF_SIZE, Label.USE_PREF_SIZE);
-    return label;
+    setOnMouseExited(mouseEvent -> lineNodeListener.onMouseExited());
   }
 }

@@ -1,6 +1,5 @@
 package praktikum.pengolahan.citra.controllers;
 
-import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -71,7 +70,7 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
       ivBrightnessEffect;
 
   private Stage histogramStage;
-  private Histogram histogramController;
+  private HistogramController histogramController;
   private Image originalImage;
   private int[][][] originalColors;
   private boolean ifPictureExists;
@@ -88,7 +87,9 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
 
   private void initHistogram() {
     FXMLLoader histogramFXMLLoader = Utils.loader(Utils.getUiResource("histogram.fxml"));
-    histogramStage = Utils.makeDialogStage(histogramFXMLLoader, "Histogram", null);
+    histogramStage = Utils.makeDialogStage(histogramFXMLLoader, "HistogramController", null);
+    histogramStage.setMinWidth(600d);
+    histogramStage.setMinHeight(600d);
     histogramController = histogramFXMLLoader.getController();
   }
 
@@ -170,19 +171,10 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
   @FXML
   private void showHistogram() {
     histogramController.setColors(originalColors);
-    Thread thread = new Thread(new Runnable() {
-      @Override
-      public void run() {
-        Platform.runLater(new Runnable() {
-          @Override
-          public void run() {
-            histogramController.populateChart();
-          }
-        });
-      }
-    });
     histogramStage.show();
-    thread.start();
+    histogramController
+        .drawChart(histogramController
+            .colorHistogramObservable());
   }
 
   @FXML
