@@ -143,7 +143,7 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
     setIvImages(file);
     ifPictureExists = true;
     toggleEffectContainer();
-    imageToNDArray = new ImageToNDArray(file, freezeBeforeExecutedStoreColorAfterExecuted());
+    imageToNDArray = new ImageToNDArray(file, waitThen());
     thread = new Thread(imageToNDArray);
     if (file != null)
       thread.start();
@@ -163,7 +163,7 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
     setIvImages(firstDraggedFile);
     ifPictureExists = true;
     toggleEffectContainer();
-    imageToNDArray = new ImageToNDArray(firstDraggedFile, freezeBeforeExecutedStoreColorAfterExecuted());
+    imageToNDArray = new ImageToNDArray(firstDraggedFile, waitThen());
     thread = new Thread(imageToNDArray);
     thread.start();
   }
@@ -248,7 +248,7 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
     };
   }
 
-  private ExecutionDetail freezeBeforeExecutedStoreColorAfterExecuted() {
+  private ExecutionDetail waitThen() {
     return new ExecutionDetail() {
       @Override
       public void preExecution() {
