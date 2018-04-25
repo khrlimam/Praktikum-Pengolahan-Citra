@@ -37,8 +37,6 @@ public class HistogramController implements Initializable {
   Label lblHistogram;
 
   private List<Integer> reds, greens, blues;
-
-
   private XYChart<Number, Number> chartSeries;
   private int[][][] colors;
   private ObservableList<XYChart.Series<String, Number>> data = FXCollections.observableArrayList();
@@ -48,10 +46,7 @@ public class HistogramController implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    xAxis.setAutoRanging(false);
-//    xAxis.setTickUnit(8d);
-//    xAxis.setLowerBound(-10d);
-//    xAxis.setUpperBound(265d);
+//    xAxis.setAutoRanging(false);
 
     redScaleCount = new XYChart.Series<>();
     greenScaleCount = new XYChart.Series<>();
@@ -89,7 +84,7 @@ public class HistogramController implements Initializable {
   }
 
   private void emitColor(ObservableEmitter<ColorHistogram> observableEmitter, int[][][] colors) {
-    for (int bit = 0; bit < 9; bit++) {
+    for (int bit = 0; bit < 256; bit++) {
       observableEmitter.onNext(fetchHistogramFor(bit));
     }
   }
