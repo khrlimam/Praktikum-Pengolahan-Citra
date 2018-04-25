@@ -6,7 +6,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.chart.LineChart;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
@@ -24,10 +25,13 @@ import java.util.stream.Collectors;
 public class HistogramController implements Initializable {
 
   @FXML
-  NumberAxis xAxis, yAxis;
+  NumberAxis yAxis;
 
   @FXML
-  LineChart<Number, Number> chart;
+  CategoryAxis xAxis;
+
+  @FXML
+  BarChart<String, Number> chart;
 
   @FXML
   Label lblHistogram;
@@ -37,17 +41,17 @@ public class HistogramController implements Initializable {
 
   private XYChart<Number, Number> chartSeries;
   private int[][][] colors;
-  private ObservableList<XYChart.Series<Number, Number>> data = FXCollections.observableArrayList();
-  private XYChart.Series<Number, Number> redScaleCount;
-  private XYChart.Series<Number, Number> greenScaleCount;
-  private XYChart.Series<Number, Number> blueScaleCount;
+  private ObservableList<XYChart.Series<String, Number>> data = FXCollections.observableArrayList();
+  private XYChart.Series<String, Number> redScaleCount;
+  private XYChart.Series<String, Number> greenScaleCount;
+  private XYChart.Series<String, Number> blueScaleCount;
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     xAxis.setAutoRanging(false);
-    xAxis.setTickUnit(8d);
-    xAxis.setLowerBound(-10d);
-    xAxis.setUpperBound(265d);
+//    xAxis.setTickUnit(8d);
+//    xAxis.setLowerBound(-10d);
+//    xAxis.setUpperBound(265d);
 
     redScaleCount = new XYChart.Series<>();
     greenScaleCount = new XYChart.Series<>();
@@ -66,26 +70,18 @@ public class HistogramController implements Initializable {
 
   public void drawChart(Observable<ColorHistogram> colorObservable) {
     colorObservable.subscribe(thisColor -> {
-      XYChart.Data redCount = new XYChart.Data(thisColor.getBit(), thisColor.getCountRed());
-      redCount.setNode(new HoveredLineChartNode(getPopup("Red", thisColor.getBit(), thisColor.getCountRed())));
+      XYChart.Data redCount = new XYChart.Data(thisColor.getBit() + "", thisColor.getCountRed());
+      redCount.setNode(new HoveredLineChartNode(showDetail("Red", thisColor.getBit(), thisColor.getCountRed())));
       redScaleCount.getData().add(redCount);
 
-      XYChart.Data greenCount = new XYChart.Data(thisColor.getBit(), thisColor.getCountGreen());
-      greenCount.setNode(new HoveredLineChartNode(getPopup("Green", thisColor.getBit(), thisColor.getCountGreen())));
+      XYChart.Data greenCount = new XYChart.Data(thisColor.getBit() + "", thisColor.getCountGreen());
+      greenCount.setNode(new HoveredLineChartNode(showDetail("Green", thisColor.getBit(), thisColor.getCountGreen())));
       greenScaleCount.getData().add(greenCount);
 
-      XYChart.Data blueCount = new XYChart.Data(thisColor.getBit(), thisColor.getCountBlue());
-      blueCount.setNode(new HoveredLineChartNode(getPopup("Blue", thisColor.getBit(), thisColor.getCountBlue())));
+      XYChart.Data blueCount = new XYChart.Data(thisColor.getBit() + "", thisColor.getCountBlue());
+      blueCount.setNode(new HoveredLineChartNode(showDetail("Blue", thisColor.getBit(), thisColor.getCountBlue())));
       blueScaleCount.getData().add(blueCount);
     });
-  }
-
-  private void sleep(int i) {
-    try {
-      Thread.sleep(i);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
   }
 
   public Observable<ColorHistogram> colorHistogramObservable() {
@@ -93,7 +89,7 @@ public class HistogramController implements Initializable {
   }
 
   private void emitColor(ObservableEmitter<ColorHistogram> observableEmitter, int[][][] colors) {
-    for (int bit = 0; bit < 256; bit++) {
+    for (int bit = 0; bit < 9; bit++) {
       observableEmitter.onNext(fetchHistogramFor(bit));
     }
   }
@@ -107,7 +103,7 @@ public class HistogramController implements Initializable {
     return colorHistogram;
   }
 
-  private LineNodeListenerHolder getPopup(String color, int x, int y) {
+  private LineNodeListenerHolder showDetail(String color, int x, int y) {
     return new LineNodeListenerHolder(color, x, y);
   }
 

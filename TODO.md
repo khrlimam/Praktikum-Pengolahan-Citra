@@ -7,7 +7,7 @@
  - Show color on hovered coordinat (**done**)
 
 ## Image Effects
- - Grey (**done**)  
+ - Grey (**done**)
  - Contrast enhancement
  - Black & White
  - Brightness enhancement

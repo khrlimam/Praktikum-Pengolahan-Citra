@@ -11,7 +11,7 @@ public class HoveredLineChartNode extends Pane {
   public HoveredLineChartNode(LineNodeListener lineNodeListener) {
     this.lineNodeListener = lineNodeListener;
     setOnMouseEntered(mouseEvent -> {
-      setCursor(Cursor.CROSSHAIR);
+      setCursor(Cursor.HAND);
       lineNodeListener.onMouseEntered();
     });
     setOnMouseExited(mouseEvent -> lineNodeListener.onMouseExited());
