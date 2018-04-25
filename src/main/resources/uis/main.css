@@ -66,6 +66,25 @@
     -fx-font-weight: bold;
 }
 
+.default-color0.chart-bar {
+    -fx-bar-fill: #e74c3c;
+    -fx-stroke: #e74c3c;
+}
+
+.default-color1.chart-bar {
+    -fx-bar-fill: #2ecc71;
+    -fx-stroke: #2ecc71;
+}
+
+.default-color2.chart-bar {
+    -fx-stroke: #3498db;
+    -fx-bar-fill: #3498db;
+}
+
+.default-color0.chart-bar-symbol { -fx-background-color: #e74c3c, white; }
+.default-color1.chart-bar-symbol { -fx-background-color: #2ecc71, white; }
+.default-color2.chart-bar-symbol { -fx-background-color: #3498db, white; }
+
 .header-text-primary {
     -fx-text-fill: #ecf0f1;
     -fx-font-family: Montserrat Regular;

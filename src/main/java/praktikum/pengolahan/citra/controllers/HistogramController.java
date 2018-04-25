@@ -46,8 +46,6 @@ public class HistogramController implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-//    xAxis.setAutoRanging(false);
-
     redScaleCount = new XYChart.Series<>();
     greenScaleCount = new XYChart.Series<>();
     blueScaleCount = new XYChart.Series<>();
