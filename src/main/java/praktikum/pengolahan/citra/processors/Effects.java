@@ -1,6 +1,7 @@
 package praktikum.pengolahan.citra.processors;
 
 import javafx.scene.image.Image;
+import praktikum.pengolahan.citra.utils.Utils;
 
 import static praktikum.pengolahan.citra.processors.ColorOperation.*;
 import static praktikum.pengolahan.citra.processors.ImageProcessor.colorsToImage;
@@ -8,13 +9,13 @@ import static praktikum.pengolahan.citra.processors.ImageProcessor.imageToColors
 
 public class Effects {
 
-  public static int[][][] addContrast(int beta, int[][][] colors) {
+  public static int[][][] addBrightness(int beta, int[][][] colors) {
     performOperationsTo(colors, (row, column) -> {
-      int newRed = (getRed(colors, row, column) + beta) & 255;
+      int newRed = Utils.getBoundedColor(getRed(colors, row, column) + beta);
       setRed(colors, row, column, newRed);
-      int newGreen = (getGreen(colors, row, column) + beta) & 255;
+      int newGreen = Utils.getBoundedColor(getGreen(colors, row, column) + beta);
       setGreen(colors, row, column, newGreen);
-      int newBlue = (getBlue(colors, row, column) + beta) & 255;
+      int newBlue = Utils.getBoundedColor(getBlue(colors, row, column) + beta);
       setBlue(colors, row, column, newBlue);
     });
     return colors;

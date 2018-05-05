@@ -90,3 +90,10 @@
     -fx-font-family: Montserrat Regular;
     -fx-font-size: 20px;
 }
+
+.content-descriptor {
+    -fx-pref-height: 40;
+    -fx-min-height: 40;
+    -fx-max-height: 40;
+    -fx-font-weight: bold;
+}

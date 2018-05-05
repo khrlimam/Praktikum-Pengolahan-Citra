@@ -44,4 +44,10 @@ public class Utils {
     return null;
   }
 
+  public static int getBoundedColor(int color) {
+    if (color < 0) return 0;
+    else if (color > 255) return 255;
+    else return color;
+  }
+
 }

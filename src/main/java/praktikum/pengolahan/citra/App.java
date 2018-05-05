@@ -10,7 +10,7 @@ import praktikum.pengolahan.citra.utils.Utils;
 
 public class App extends Application {
 
-  private static String MAIN_LAYOUT = "main.fxml";
+  public static String MAIN_LAYOUT = "main.fxml";
   public static Stage APP_STAGE;
 
   @Override
@@ -23,7 +23,6 @@ public class App extends Application {
     primaryStage.setMinWidth(800d);
     primaryStage.show();
   }
-
 
   public static void main(String[] args) {
     launch(args);

@@ -5,4 +5,7 @@ public class Constants {
   public static final String IMAGE_CHOOSER_DIALOG_TITLE = "Pilih Gambar";
   public static final int THUMBNAIL_EFFECT_WIDTH = 80;
   public static final int THUMBNAIL_EFFECT_HEIGHT = 80;
+  public static final int PREVIEW_WIDTH = 334;
+  public static final int PREVIEW_HEIGHT = 292;
+
 }

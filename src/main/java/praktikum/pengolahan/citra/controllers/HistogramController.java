@@ -2,6 +2,7 @@ package praktikum.pengolahan.citra.controllers;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
+import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -62,19 +63,21 @@ public class HistogramController implements Initializable {
   }
 
   public void drawChart(Observable<ColorHistogram> colorObservable) {
-    colorObservable.subscribe(thisColor -> {
-      XYChart.Data redCount = new XYChart.Data(thisColor.getBit() + "", thisColor.getCountRed());
-      redCount.setNode(new HoveredLineChartNode(showDetail("Red", thisColor.getBit(), thisColor.getCountRed())));
-      redScaleCount.getData().add(redCount);
+    colorObservable
+        .observeOn(JavaFxScheduler.platform())
+        .subscribe(mColor -> {
+          XYChart.Data redCount = new XYChart.Data(mColor.getBit() + "", mColor.getCountRed());
+          redCount.setNode(new HoveredLineChartNode(showDetail("Red", mColor.getBit(), mColor.getCountRed())));
+          redScaleCount.getData().add(redCount);
 
-      XYChart.Data greenCount = new XYChart.Data(thisColor.getBit() + "", thisColor.getCountGreen());
-      greenCount.setNode(new HoveredLineChartNode(showDetail("Green", thisColor.getBit(), thisColor.getCountGreen())));
-      greenScaleCount.getData().add(greenCount);
+          XYChart.Data greenCount = new XYChart.Data(mColor.getBit() + "", mColor.getCountGreen());
+          greenCount.setNode(new HoveredLineChartNode(showDetail("Green", mColor.getBit(), mColor.getCountGreen())));
+          greenScaleCount.getData().add(greenCount);
 
-      XYChart.Data blueCount = new XYChart.Data(thisColor.getBit() + "", thisColor.getCountBlue());
-      blueCount.setNode(new HoveredLineChartNode(showDetail("Blue", thisColor.getBit(), thisColor.getCountBlue())));
-      blueScaleCount.getData().add(blueCount);
-    });
+          XYChart.Data blueCount = new XYChart.Data(mColor.getBit() + "", mColor.getCountBlue());
+          blueCount.setNode(new HoveredLineChartNode(showDetail("Blue", mColor.getBit(), mColor.getCountBlue())));
+          blueScaleCount.getData().add(blueCount);
+        });
   }
 
   public Observable<ColorHistogram> colorHistogramObservable() {

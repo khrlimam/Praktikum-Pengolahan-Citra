@@ -17,14 +17,17 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import praktikum.pengolahan.citra.App;
 import praktikum.pengolahan.citra.contracts.ApplyEffect;
+import praktikum.pengolahan.citra.contracts.ApplyWithParams;
 import praktikum.pengolahan.citra.contracts.ExecutionDetail;
 import praktikum.pengolahan.citra.contracts.ReactTo;
-import praktikum.pengolahan.citra.handleres.ImageToNDArray;
+import praktikum.pengolahan.citra.processors.Editor;
 import praktikum.pengolahan.citra.handleres.RealImageCoordinat;
-import praktikum.pengolahan.citra.processors.Effects;
+import praktikum.pengolahan.citra.processors.ImageProcessor;
 import praktikum.pengolahan.citra.utils.Constants;
 import praktikum.pengolahan.citra.utils.FileUtils;
+import praktikum.pengolahan.citra.utils.Log;
 import praktikum.pengolahan.citra.utils.Utils;
 
 import java.io.File;
@@ -36,8 +39,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
-
-import static praktikum.pengolahan.citra.processors.ImageProcessor.colorsToImage;
 
 
 public class MainController implements Initializable, EventHandler<MouseEvent> {
@@ -69,21 +70,35 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
       ivBlackWhiteEffect,
       ivBrightnessEffect;
 
-  private Stage histogramStage;
+  private Stage histogramStage, brightnessStage;
   private HistogramController histogramController;
+  private BrightnessSettingController brightnessSettingController;
   private Image originalImage;
-  private int[][][] originalColors;
   private boolean ifPictureExists;
   private List<ImageView> effectThumbs = new ArrayList<>();
   private HashMap<String, ApplyEffect> effects = new HashMap<>();
   private Thread thread;
-  private ImageToNDArray imageToNDArray;
+  private Editor editor;
 
   public void initialize(URL location, ResourceBundle resources) {
     lblTitle.setText(Constants.APP_NAME);
     initEffects();
     setDefaultImage();
+    initDialogs();
   }
+
+  private void initDialogs() {
+    FXMLLoader brightnessControllerLoader = Utils.loader(Utils.getUiResource("brightness.fxml"));
+    brightnessStage = Utils.makeDialogStage(brightnessControllerLoader, "Brightness Setting", App.APP_STAGE);
+    brightnessStage.setMinWidth(484d);
+    brightnessStage.setMaxWidth(484d);
+    brightnessStage.setMinHeight(441d);
+    brightnessStage.setMaxHeight(441d);
+    brightnessSettingController = brightnessControllerLoader.getController();
+    brightnessSettingController.setApplyWithParams(applyBrightness());
+    brightnessStage.setOnCloseRequest(event -> editor.returnColorPreviewStateToOriginal());
+  }
+
 
   private void initHistogram() {
     FXMLLoader histogramFXMLLoader = Utils.loader(Utils.getUiResource("histogram.fxml"));
@@ -104,17 +119,17 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
     registerEffects(ivGreyEffect, () -> applyGray());
     registerEffects(ivContrastEffect, () -> applyContrast());
     registerEffects(ivBlackWhiteEffect, () -> applyBlackWhite());
-    registerEffects(ivBrightnessEffect, () -> applyBrightness());
+    registerEffects(ivBrightnessEffect, () -> showBrightnessSetting());
   }
 
   private void applyOriginal() {
-    ivImageToEdit.setImage(originalImage);
+    editor.returnToOriginalState();
+    ivImageToEdit.setImage(editor.getEditedImage());
   }
 
   private void applyGray() {
-    int[][][] imageToColors = imageToNDArray.getImageToColors();
-    int[][][] grayScaledColors = Effects.grayScale(imageToColors);
-    ivImageToEdit.setImage(colorsToImage(grayScaledColors));
+    editor.addGray();
+    ivImageToEdit.setImage(editor.getEditedImage());
   }
 
   private void applyContrast() {
@@ -125,8 +140,20 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
     System.out.println("adding black white effect!");
   }
 
-  private void applyBrightness() {
-    System.out.println("adding brightness effect!");
+  private void showBrightnessSetting() {
+    brightnessSettingController.setIvPreviewImage(editor.getPreviewImage());
+    brightnessSettingController.setColorPreview(editor.getColorPreviewState());
+    System.out.println(brightnessSettingController.swap);
+    brightnessStage.showAndWait();
+  }
+
+  private ApplyWithParams applyBrightness() {
+    return (param) -> {
+      Log.i(getClass(), param+"");
+      editor.addBrightness(param);
+      ivImageToEdit.setImage(editor.getEditedImage());
+      brightnessStage.close();
+    };
   }
 
   private void toggleEffectContainer() {
@@ -143,8 +170,8 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
     setIvImages(file);
     ifPictureExists = true;
     toggleEffectContainer();
-    imageToNDArray = new ImageToNDArray(file, waitThen());
-    thread = new Thread(imageToNDArray);
+    editor = new Editor(file, waitThen());
+    thread = new Thread(editor);
     if (file != null)
       thread.start();
   }
@@ -163,14 +190,14 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
     setIvImages(firstDraggedFile);
     ifPictureExists = true;
     toggleEffectContainer();
-    imageToNDArray = new ImageToNDArray(firstDraggedFile, waitThen());
-    thread = new Thread(imageToNDArray);
+    editor = new Editor(firstDraggedFile, waitThen());
+    thread = new Thread(editor);
     thread.start();
   }
 
   @FXML
   private void showHistogram() {
-    histogramController.setColors(originalColors);
+    histogramController.setColors(editor.getColorState());
     histogramStage.show();
     histogramController
         .drawChart(histogramController
@@ -211,7 +238,7 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
           Constants.THUMBNAIL_EFFECT_HEIGHT,
           false,
           false);
-
+      Log.i(getClass(), String.format("%s %s", image.getWidth(), image.getHeight()));
       effectThumbs.forEach(imageView -> imageView.setImage(image));
     } catch (FileNotFoundException e) {
       e.printStackTrace();
@@ -257,7 +284,6 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
 
       @Override
       public void postExecution() {
-        originalColors = imageToNDArray.getImageToColors();
         apWaitContainer.setVisible(false);
       }
     };

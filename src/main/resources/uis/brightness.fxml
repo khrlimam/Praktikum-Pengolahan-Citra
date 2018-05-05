@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="441.0"
+            prefWidth="484.0" stylesheets="@main.css" xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="praktikum.pengolahan.citra.controllers.BrightnessSettingController">
+  <children>
+    <VBox layoutX="129.0" layoutY="-18.0" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0"
+          AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <children>
+        <HBox prefHeight="97.0" prefWidth="600.0" styleClass="header-primary">
+          <children>
+            <AnchorPane styleClass="header-primary" HBox.hgrow="ALWAYS">
+              <children>
+                <Label layoutX="87.0" layoutY="60.0" prefHeight="55.0" prefWidth="600.0"
+                       styleClass="header-text-primary" text="Brightness Setting" AnchorPane.bottomAnchor="0.0"
+                       AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <padding>
+                    <Insets left="10.0"/>
+                  </padding>
+                </Label>
+              </children>
+            </AnchorPane>
+          </children>
+        </HBox>
+        <HBox>
+          <children>
+            <VBox>
+              <children>
+                <AnchorPane styleClass="content-descriptor">
+                  <children>
+                    <Label alignment="CENTER" prefHeight="15.0" prefWidth="334.0" text="Preview"
+                           AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                           AnchorPane.topAnchor="0.0"/>
+                  </children>
+                </AnchorPane>
+                <ImageView fx:id="ivPreview" fitHeight="292.0" fitWidth="334.0" pickOnBounds="true" preserveRatio="true"
+                           smooth="false"/>
+              </children>
+              <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+              </padding>
+            </VBox>
+            <VBox>
+              <children>
+                <AnchorPane prefHeight="40.0" prefWidth="150.0" styleClass="content-descriptor">
+                  <children>
+                    <Label fx:id="lblBetaLevel" alignment="CENTER" prefHeight="40.0" prefWidth="150.0"
+                           AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                           AnchorPane.topAnchor="0.0">
+                      <font>
+                        <Font name="System Bold" size="13.0"/>
+                      </font>
+                    </Label>
+                  </children>
+                </AnchorPane>
+                <HBox VBox.vgrow="ALWAYS">
+                  <children>
+                    <Pane prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS"/>
+                    <Slider fx:id="sBetaLevel" majorTickUnit="11.0" minorTickCount="1" orientation="VERTICAL"
+                            showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0"/>
+                    <Pane prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS"/>
+                  </children>
+                </HBox>
+                <AnchorPane>
+                  <children>
+                    <Label alignment="CENTER" prefHeight="15.0" prefWidth="130.0" styleClass="content-descriptor"
+                           text="Beta Level" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                           AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+                  </children>
+                </AnchorPane>
+              </children>
+              <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+              </padding>
+            </VBox>
+          </children>
+        </HBox>
+        <HBox prefHeight="34.0" prefWidth="484.0" VBox.vgrow="ALWAYS">
+          <children>
+            <Pane prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS"/>
+            <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#applyBrightness"
+                    prefHeight="25.0" prefWidth="82.0" styleClass="btn-primary" text="Save">
+              <HBox.margin>
+                <Insets right="15.0"/>
+              </HBox.margin>
+            </Button>
+          </children>
+          <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+          </padding>
+        </HBox>
+      </children>
+    </VBox>
+  </children>
+</AnchorPane>
