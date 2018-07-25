@@ -3,6 +3,7 @@ package praktikum.pengolahan.citra.processors;
 import javafx.scene.image.Image;
 import praktikum.pengolahan.citra.contracts.ExecutionDetail;
 import praktikum.pengolahan.citra.utils.Constants;
+import praktikum.pengolahan.citra.utils.Utils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -52,8 +53,9 @@ public class Editor implements Runnable {
   }
 
   private void executePost() {
-    if (executionDetail != null)
+    if (executionDetail != null) {
       executionDetail.postExecution();
+    }
   }
 
   public void returnToOriginalState() {
@@ -76,12 +78,18 @@ public class Editor implements Runnable {
     Effects.grayScale(getColorPreviewState());
   }
 
+  public void addGreen() {
+    Effects.toGreen(getColorState());
+    Effects.toGreen(getColorPreviewState());
+  }
+
   void addContrast(int alpha) {
 
   }
 
-  void addBlackWhite() {
-
+  public void addBlackWhite() {
+    Effects.blackWhite(getColorState());
+    Effects.blackWhite(getColorPreviewState());
   }
 
   public void addBrightness(int beta) {

@@ -6,6 +6,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import praktikum.pengolahan.citra.App;
+import praktikum.pengolahan.citra.processors.ColorOperation;
 
 import java.io.IOException;
 import java.net.URL;
@@ -48,6 +49,41 @@ public class Utils {
     if (color < 0) return 0;
     else if (color > 255) return 255;
     else return color;
+  }
+
+  public static int setThreshold(int color, int threshold) {
+    if (color <= threshold) return 0;
+    return 255;
+  }
+
+  public static int setThreshold(double color, int threshold) {
+    if (color <= threshold) return 10;
+    return 255;
+  }
+
+  public static int binaryImageBound(int color) {
+    int bw = setThreshold(color, 200);
+    return bw / 255;
+  }
+
+  public static int binaryImageBound(double color) {
+    int bw = setThreshold(color, 200);
+    return bw / 255;
+  }
+
+  public static int[][][] balanceInputMatrix(int[][][] inputMatrix) {
+    int inputWidth = ColorOperation.getWidth(inputMatrix);
+    int inputHeight = ColorOperation.getHeight(inputMatrix);
+
+    int[][][] balancedMatrix = new int[132][71][1];
+
+    int colNeeded = Constants.EXPECTED_WIDTH - inputWidth;
+    int rowNeeded = Constants.EXPECTED_HEIGHT - inputHeight;
+
+    if (colNeeded > 0 && rowNeeded > 0) {
+
+    }
+    return balancedMatrix;
   }
 
 }

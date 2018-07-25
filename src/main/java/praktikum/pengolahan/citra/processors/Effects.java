@@ -34,11 +34,31 @@ public class Effects {
     return inputColors;
   }
 
+  public static int[][][] toGreen(int[][][] inputColors) {
+    performOperationsTo(inputColors, (row, column) -> {
+      // deactivate red channel
+      setRed(inputColors, row, column, 0);
+      // deactivate blue channel
+      setBlue(inputColors, row, column, 0);
+    });
+    return inputColors;
+  }
+
   public static Image grayScale(Image inputImage) {
     int[][][] colors = imageToColors(inputImage);
     int[][][] grayScaled = grayScale(colors);
     return colorsToImage(grayScaled);
   }
 
-
+  public static int[][][] blackWhite(int[][][] inputColors) {
+    performOperationsTo(inputColors, (row, column) -> {
+      //all color channels are the same value so we only take one channel, this case is the first index (RED)
+      int greyColored = getRed(inputColors, row, column);
+      int blackOrWhite = Utils.binaryImageBound(greyColored)*255;
+      setRed(inputColors, row, column, blackOrWhite);
+      setGreen(inputColors, row, column, blackOrWhite);
+      setBlue(inputColors, row, column, blackOrWhite);
+    });
+    return inputColors;
+  }
 }

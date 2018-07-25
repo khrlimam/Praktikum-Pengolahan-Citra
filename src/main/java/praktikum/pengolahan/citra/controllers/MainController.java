@@ -1,5 +1,7 @@
 package praktikum.pengolahan.citra.controllers;
 
+import Jama.Matrix;
+import Jama.SingularValueDecomposition;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -18,12 +20,13 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import praktikum.pengolahan.citra.App;
+import praktikum.pengolahan.citra.PlatReader;
 import praktikum.pengolahan.citra.contracts.ApplyEffect;
 import praktikum.pengolahan.citra.contracts.ApplyWithParams;
 import praktikum.pengolahan.citra.contracts.ExecutionDetail;
 import praktikum.pengolahan.citra.contracts.ReactTo;
-import praktikum.pengolahan.citra.processors.Editor;
 import praktikum.pengolahan.citra.handleres.RealImageCoordinat;
+import praktikum.pengolahan.citra.processors.Editor;
 import praktikum.pengolahan.citra.processors.ImageProcessor;
 import praktikum.pengolahan.citra.utils.Constants;
 import praktikum.pengolahan.citra.utils.FileUtils;
@@ -42,6 +45,8 @@ import java.util.ResourceBundle;
 
 
 public class MainController implements Initializable, EventHandler<MouseEvent> {
+
+  private static final String TAG = MainController.class.getSimpleName();
 
   @FXML
   Label
@@ -68,7 +73,8 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
       ivGreyEffect,
       ivContrastEffect,
       ivBlackWhiteEffect,
-      ivBrightnessEffect;
+      ivBrightnessEffect,
+      ivConvertToGreen;
 
   private Stage histogramStage, brightnessStage;
   private HistogramController histogramController;
@@ -79,6 +85,8 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
   private HashMap<String, ApplyEffect> effects = new HashMap<>();
   private Thread thread;
   private Editor editor;
+  private File inputDigitImage;
+  private double[] q;
 
   public void initialize(URL location, ResourceBundle resources) {
     lblTitle.setText(Constants.APP_NAME);
@@ -120,6 +128,12 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
     registerEffects(ivContrastEffect, () -> applyContrast());
     registerEffects(ivBlackWhiteEffect, () -> applyBlackWhite());
     registerEffects(ivBrightnessEffect, () -> showBrightnessSetting());
+    registerEffects(ivConvertToGreen, () -> applyToGreen());
+  }
+
+  private void applyToGreen() {
+    editor.addGreen();
+    ivImageToEdit.setImage(editor.getEditedImage());
   }
 
   private void applyOriginal() {
@@ -134,10 +148,89 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
 
   private void applyContrast() {
     System.out.println("adding contrast effect!");
+    Matrix models = new Matrix(PlatReader.getModels());
+    SingularValueDecomposition modelSvd = new SingularValueDecomposition(models.transpose());
+    Matrix modelU = modelSvd.getU();
+    Matrix modelS = modelSvd.getS();
+    Matrix modelV = modelSvd.getV();
+    Matrix modelVt = modelSvd.getV().transpose();
+
+    double[][] modelUKm = new double[modelU.getRowDimension()][2];
+    double[][] modelVKm = new double[modelV.getRowDimension()][2];
+    double[][] modelSKm = new double[2][2];
+
+    for (int h = 0; h < modelU.getRowDimension(); h++) {
+      for (int i = 0; i < 2; i++) {
+        modelUKm[h][i] = modelU.get(h, i);
+      }
+    }
+
+    for (int h = 0; h < modelV.getRowDimension(); h++) {
+      for (int i = 0; i < 2; i++) {
+        modelVKm[h][i] = modelV.get(h, i);
+      }
+    }
+
+    for (int h = 0; h < 2; h++) {
+      for (int i = 0; i < 2; i++) {
+        modelSKm[h][i] = modelS.get(h, i);
+      }
+    }
+
+    Matrix modelUk = new Matrix(modelUKm);
+    Matrix modelVkt = new Matrix(modelVKm).transpose();
+    Matrix modelSk = new Matrix(modelSKm);
+
+    List<ImageCoordinat> imageCoordinats = new ArrayList<>();
+
+    modelVkt.transpose().print(2, 10);
+
+    for (int i = 0; i < modelVkt.transpose().getRowDimension(); i++) {
+      double x = modelVkt.transpose().get(i, 0);
+      double y = modelVkt.transpose().get(i, 1);
+      imageCoordinats.add(new ImageCoordinat(x, y));
+    }
+
+    Matrix q = new Matrix(this.q, 1);
+
+    Log.i(getClass().getName(), modelU.getRowDimension() + " x " + modelU.getColumnDimension());
+    Log.i(getClass().getName(), modelUk.getRowDimension() + " x " + modelUk.getColumnDimension());
+    Log.i(getClass().getName(), q.getRowDimension() + " x " + q.getColumnDimension());
+    Log.i(getClass().getName(), modelSk.getRowDimension() + " x " + modelSk.getColumnDimension());
+
+    modelSk.inverse().print(2, 2);
+
+
+    Matrix qCoordinatem = q.times(modelUk).times(modelSk.inverse());
+
+    ImageCoordinat qCoordinate = new ImageCoordinat(qCoordinatem.get(0, 0), qCoordinatem.get(0, 1));
+
+    List<Double> similarities = new ArrayList<>();
+
+    for (int i = 0; i < imageCoordinats.size(); i++) {
+      double enumerator = qtimesd(qCoordinate, imageCoordinats.get(i));
+      double denumerator = absqtimesqbsd(qCoordinate, imageCoordinats.get(i));
+      similarities.add(enumerator / denumerator);
+    }
+
+    similarities.stream().forEach(aDouble -> {
+      System.out.println("Similarity");
+      System.out.println(aDouble);
+    });
   }
 
+  private double qtimesd(ImageCoordinat q, ImageCoordinat d) {
+    return q.x * d.x + q.y * d.y;
+  }
+
+  private double absqtimesqbsd(ImageCoordinat q, ImageCoordinat d) {
+    return Math.sqrt(Math.pow(q.x, 2) + Math.pow(q.y, 2)) * Math.sqrt(Math.pow(d.x, 2) + Math.pow(d.y, 2));
+  }
+
+
   private void applyBlackWhite() {
-    System.out.println("adding black white effect!");
+    editor.addBlackWhite();
+    ivImageToEdit.setImage(editor.getEditedImage());
   }
 
   private void showBrightnessSetting() {
@@ -149,7 +242,7 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
 
   private ApplyWithParams applyBrightness() {
     return (param) -> {
-      Log.i(getClass(), param+"");
+      Log.i(TAG, param + "");
       editor.addBrightness(param);
       ivImageToEdit.setImage(editor.getEditedImage());
       brightnessStage.close();
@@ -166,14 +259,19 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
 
   @FXML
   private void choosePicture() {
-    File file = FileUtils.showChoseImageFileDialog();
-    setIvImages(file);
-    ifPictureExists = true;
-    toggleEffectContainer();
-    editor = new Editor(file, waitThen());
-    thread = new Thread(editor);
-    if (file != null)
+    try {
+      File file = FileUtils.showChoseImageFileDialog();
+      setIvImages(file);
+      ifPictureExists = true;
+      toggleEffectContainer();
+      this.inputDigitImage = file;
+      q = PlatReader.flatten(ImageProcessor.imageToColorsDoubled(inputDigitImage));
+      editor = new Editor(file, waitThen());
+      thread = new Thread(editor);
       thread.start();
+    } catch (Exception e) {
+      Log.i(TAG, "Ignore all exception");
+    }
   }
 
   @FXML
@@ -238,7 +336,6 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
           Constants.THUMBNAIL_EFFECT_HEIGHT,
           false,
           false);
-      Log.i(getClass(), String.format("%s %s", image.getWidth(), image.getHeight()));
       effectThumbs.forEach(imageView -> imageView.setImage(image));
     } catch (FileNotFoundException e) {
       e.printStackTrace();
@@ -264,13 +361,15 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
       Image imageSource = ivImageToEdit.getImage();
       PixelReader pixelReader = imageSource.getPixelReader();
       Color color = pixelReader.getColor(x, y);
-      String coordinat = String.format("(%d, %d)", x, y);
-      lblCoordinat.setText(coordinat);
       int red = (int) (color.getRed() * 255);
       int green = (int) (color.getGreen() * 255);
       int blue = (int) (color.getBlue() * 255);
+
       String hexColor = String.format("#%s%s%s", Integer.toHexString(red), Integer.toHexString(green), Integer.toHexString(blue));
+      String coordinatAndColorDetail = String.format("(%d, %d), (%d, %d, %d)", x, y, red, green, blue);
       String backgroundColor = String.format("-fx-background-color: %s", hexColor);
+
+      lblCoordinat.setText(coordinatAndColorDetail);
       pColor.setStyle(backgroundColor);
     };
   }
@@ -288,4 +387,30 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
       }
     };
   }
+
+  private class ImageCoordinat {
+    private double x, y;
+
+    public double getX() {
+      return x;
+    }
+
+    public void setX(double x) {
+      this.x = x;
+    }
+
+    public double getY() {
+      return y;
+    }
+
+    public void setY(double y) {
+      this.y = y;
+    }
+
+    public ImageCoordinat(double x, double y) {
+      this.x = x;
+      this.y = y;
+    }
+  }
+
 }

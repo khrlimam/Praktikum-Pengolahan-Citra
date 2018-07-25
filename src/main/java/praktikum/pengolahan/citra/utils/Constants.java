@@ -7,5 +7,7 @@ public class Constants {
   public static final int THUMBNAIL_EFFECT_HEIGHT = 80;
   public static final int PREVIEW_WIDTH = 334;
   public static final int PREVIEW_HEIGHT = 292;
+  public static final int EXPECTED_WIDTH = 71;
+  public static final int EXPECTED_HEIGHT = 132;
 
 }
