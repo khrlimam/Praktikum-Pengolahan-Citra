@@ -222,9 +222,8 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
       this.inputDigitImage = file;
       newComerMatrix = MatrixModel.flatten(ImageProcessor.imageToColorsDoubled(inputDigitImage));
       editor = new Editor(file, waitThen());
-//      thread = new Thread(editor);
-      editor.run();
-//      thread.start();
+      thread = new Thread(editor);
+      thread.start();
     } catch (Exception e) {
       Log.i(TAG, "Ignore all exception");
     }
