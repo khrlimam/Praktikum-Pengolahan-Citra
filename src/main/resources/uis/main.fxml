@@ -90,14 +90,14 @@
                     <Pane maxWidth="10.0" HBox.hgrow="ALWAYS" />
                     <StackPane styleClass="effect-thumbnail-container" HBox.hgrow="ALWAYS">
                       <children>
-                        <ImageView fx:id="ivContrastEffect" fitHeight="80.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" styleClass="add-border">
+                        <ImageView fx:id="ivReadDigit" fitHeight="80.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" styleClass="add-border">
                           <cursor>
                             <Cursor fx:constant="HAND" />
                           </cursor>
                         </ImageView>
                         <AnchorPane maxHeight="30.0" minHeight="30.0" prefHeight="30.0" styleClass="effect-label" StackPane.alignment="BOTTOM_CENTER" VBox.vgrow="ALWAYS">
                           <children>
-                            <Label alignment="CENTER" prefHeight="30.0" prefWidth="80.0" text="Contrast" textAlignment="CENTER" textFill="WHITE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                            <Label alignment="CENTER" prefHeight="30.0" prefWidth="80.0" text="Read Digit" textAlignment="CENTER" textFill="WHITE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                           </children>
                         </AnchorPane>
                       </children>

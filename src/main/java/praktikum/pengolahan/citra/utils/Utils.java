@@ -56,9 +56,9 @@ public class Utils {
     return 255;
   }
 
-  public static int setThreshold(double color, int threshold) {
-    if (color <= threshold) return 10;
-    return 255;
+  public static double setThreshold(double color, int threshold) {
+    if (color <= threshold) return 1d;
+    return 255d;
   }
 
   public static int binaryImageBound(int color) {
@@ -66,8 +66,8 @@ public class Utils {
     return bw / 255;
   }
 
-  public static int binaryImageBound(double color) {
-    int bw = setThreshold(color, 200);
+  public static double binaryImageBound(double color) {
+    double bw = setThreshold(color, 200);
     return bw / 255;
   }
 

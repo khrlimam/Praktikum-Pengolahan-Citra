@@ -1,7 +1,6 @@
 package praktikum.pengolahan.citra.controllers;
 
 import Jama.Matrix;
-import Jama.SingularValueDecomposition;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -20,11 +19,13 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import praktikum.pengolahan.citra.App;
-import praktikum.pengolahan.citra.PlatReader;
 import praktikum.pengolahan.citra.contracts.ApplyEffect;
 import praktikum.pengolahan.citra.contracts.ApplyWithParams;
 import praktikum.pengolahan.citra.contracts.ExecutionDetail;
 import praktikum.pengolahan.citra.contracts.ReactTo;
+import praktikum.pengolahan.citra.digitrecognizer.MatrixModel;
+import praktikum.pengolahan.citra.digitrecognizer.SimilarityProcess;
+import praktikum.pengolahan.citra.digitrecognizer.pojos.SimilarityHolder;
 import praktikum.pengolahan.citra.handleres.RealImageCoordinat;
 import praktikum.pengolahan.citra.processors.Editor;
 import praktikum.pengolahan.citra.processors.ImageProcessor;
@@ -42,6 +43,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 
 public class MainController implements Initializable, EventHandler<MouseEvent> {
@@ -71,7 +73,7 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
       ivImageToEdit,
       ivOriginal,
       ivGreyEffect,
-      ivContrastEffect,
+      ivReadDigit,
       ivBlackWhiteEffect,
       ivBrightnessEffect,
       ivConvertToGreen;
@@ -86,13 +88,15 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
   private Thread thread;
   private Editor editor;
   private File inputDigitImage;
-  private double[] q;
+  private double[] newComerMatrix;
+  private SimilarityProcess similarityProcess;
 
   public void initialize(URL location, ResourceBundle resources) {
     lblTitle.setText(Constants.APP_NAME);
     initEffects();
     setDefaultImage();
     initDialogs();
+    similarityProcess = new SimilarityProcess();
   }
 
   private void initDialogs() {
@@ -125,7 +129,7 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
   private void initEffects() {
     registerEffects(ivOriginal, () -> applyOriginal());
     registerEffects(ivGreyEffect, () -> applyGray());
-    registerEffects(ivContrastEffect, () -> applyContrast());
+    registerEffects(ivReadDigit, () -> readDigit());
     registerEffects(ivBlackWhiteEffect, () -> applyBlackWhite());
     registerEffects(ivBrightnessEffect, () -> showBrightnessSetting());
     registerEffects(ivConvertToGreen, () -> applyToGreen());
@@ -146,87 +150,24 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
     ivImageToEdit.setImage(editor.getEditedImage());
   }
 
-  private void applyContrast() {
-    System.out.println("adding contrast effect!");
-    Matrix models = new Matrix(PlatReader.getModels());
-    SingularValueDecomposition modelSvd = new SingularValueDecomposition(models.transpose());
-    Matrix modelU = modelSvd.getU();
-    Matrix modelS = modelSvd.getS();
-    Matrix modelV = modelSvd.getV();
-    Matrix modelVt = modelSvd.getV().transpose();
+  private void readDigit() {
+    System.out.println("Reading digit!");
+    Matrix newComer = new Matrix(this.newComerMatrix, 1);
+    List<SimilarityHolder> sorted = similarityProcess.findSimilarityAndSort(newComer);
+    double highestScore = sorted.get(0).getScore();
+    int gottenNumber = sorted.get(0).getNumbLabel();
+    List<Integer> otherSimilarScore = sorted.stream().filter(similarityHolder ->
+        similarityHolder.getScore() == highestScore)
+        .map(SimilarityHolder::getNumbLabel).collect(Collectors.toList());
 
-    double[][] modelUKm = new double[modelU.getRowDimension()][2];
-    double[][] modelVKm = new double[modelV.getRowDimension()][2];
-    double[][] modelSKm = new double[2][2];
-
-    for (int h = 0; h < modelU.getRowDimension(); h++) {
-      for (int i = 0; i < 2; i++) {
-        modelUKm[h][i] = modelU.get(h, i);
-      }
-    }
-
-    for (int h = 0; h < modelV.getRowDimension(); h++) {
-      for (int i = 0; i < 2; i++) {
-        modelVKm[h][i] = modelV.get(h, i);
-      }
-    }
-
-    for (int h = 0; h < 2; h++) {
-      for (int i = 0; i < 2; i++) {
-        modelSKm[h][i] = modelS.get(h, i);
-      }
-    }
-
-    Matrix modelUk = new Matrix(modelUKm);
-    Matrix modelVkt = new Matrix(modelVKm).transpose();
-    Matrix modelSk = new Matrix(modelSKm);
-
-    List<ImageCoordinat> imageCoordinats = new ArrayList<>();
-
-    modelVkt.transpose().print(2, 10);
-
-    for (int i = 0; i < modelVkt.transpose().getRowDimension(); i++) {
-      double x = modelVkt.transpose().get(i, 0);
-      double y = modelVkt.transpose().get(i, 1);
-      imageCoordinats.add(new ImageCoordinat(x, y));
-    }
-
-    Matrix q = new Matrix(this.q, 1);
-
-    Log.i(getClass().getName(), modelU.getRowDimension() + " x " + modelU.getColumnDimension());
-    Log.i(getClass().getName(), modelUk.getRowDimension() + " x " + modelUk.getColumnDimension());
-    Log.i(getClass().getName(), q.getRowDimension() + " x " + q.getColumnDimension());
-    Log.i(getClass().getName(), modelSk.getRowDimension() + " x " + modelSk.getColumnDimension());
-
-    modelSk.inverse().print(2, 2);
+    sorted.forEach(similarityHolder ->
+        System.out.println(String
+            .format("Number %d, score %.9f",
+                similarityHolder.getNumbLabel(),
+                similarityHolder.getScore())));
 
 
-    Matrix qCoordinatem = q.times(modelUk).times(modelSk.inverse());
-
-    ImageCoordinat qCoordinate = new ImageCoordinat(qCoordinatem.get(0, 0), qCoordinatem.get(0, 1));
-
-    List<Double> similarities = new ArrayList<>();
-
-    for (int i = 0; i < imageCoordinats.size(); i++) {
-      double enumerator = qtimesd(qCoordinate, imageCoordinats.get(i));
-      double denumerator = absqtimesqbsd(qCoordinate, imageCoordinats.get(i));
-      similarities.add(enumerator / denumerator);
-    }
-
-    similarities.stream().forEach(aDouble -> {
-      System.out.println("Similarity");
-      System.out.println(aDouble);
-    });
   }
-
-  private double qtimesd(ImageCoordinat q, ImageCoordinat d) {
-    return q.x * d.x + q.y * d.y;
-  }
-
-  private double absqtimesqbsd(ImageCoordinat q, ImageCoordinat d) {
-    return Math.sqrt(Math.pow(q.x, 2) + Math.pow(q.y, 2)) * Math.sqrt(Math.pow(d.x, 2) + Math.pow(d.y, 2));
-  }
-
 
   private void applyBlackWhite() {
     editor.addBlackWhite();
@@ -265,7 +206,7 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
       ifPictureExists = true;
       toggleEffectContainer();
       this.inputDigitImage = file;
-      q = PlatReader.flatten(ImageProcessor.imageToColorsDoubled(inputDigitImage));
+      newComerMatrix = MatrixModel.flatten(ImageProcessor.imageToColorsDoubled(inputDigitImage));
       editor = new Editor(file, waitThen());
       thread = new Thread(editor);
       thread.start();
@@ -387,30 +328,4 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
       }
     };
   }
-
-  private class ImageCoordinat {
-    private double x, y;
-
-    public double getX() {
-      return x;
-    }
-
-    public void setX(double x) {
-      this.x = x;
-    }
-
-    public double getY() {
-      return y;
-    }
-
-    public void setY(double y) {
-      this.y = y;
-    }
-
-    public ImageCoordinat(double x, double y) {
-      this.x = x;
-      this.y = y;
-    }
-  }
-
 }
