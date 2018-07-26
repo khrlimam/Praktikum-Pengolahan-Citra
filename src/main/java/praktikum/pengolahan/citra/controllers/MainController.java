@@ -18,6 +18,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import org.apache.commons.lang3.StringUtils;
 import praktikum.pengolahan.citra.App;
 import praktikum.pengolahan.citra.contracts.ApplyEffect;
 import praktikum.pengolahan.citra.contracts.ApplyWithParams;
@@ -80,6 +81,7 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
 
   private Stage histogramStage, brightnessStage;
   private HistogramController histogramController;
+  private DigitController digitController;
   private BrightnessSettingController brightnessSettingController;
   private Image originalImage;
   private boolean ifPictureExists;
@@ -90,6 +92,7 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
   private File inputDigitImage;
   private double[] newComerMatrix;
   private SimilarityProcess similarityProcess;
+  private Stage digitStage;
 
   public void initialize(URL location, ResourceBundle resources) {
     lblTitle.setText(Constants.APP_NAME);
@@ -109,6 +112,10 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
     brightnessSettingController = brightnessControllerLoader.getController();
     brightnessSettingController.setApplyWithParams(applyBrightness());
     brightnessStage.setOnCloseRequest(event -> editor.returnColorPreviewStateToOriginal());
+
+    FXMLLoader digitLoader = Utils.loader(Utils.getUiResource("viewdigits.fxml"));
+    digitStage = Utils.makeDialogStage(digitLoader, "Digit", App.APP_STAGE);
+    digitController = digitLoader.getController();
   }
 
 
@@ -156,17 +163,24 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
     List<SimilarityHolder> sorted = similarityProcess.findSimilarityAndSort(newComer);
     double highestScore = sorted.get(0).getScore();
     int gottenNumber = sorted.get(0).getNumbLabel();
-    List<Integer> otherSimilarScore = sorted.stream().filter(similarityHolder ->
-        similarityHolder.getScore() == highestScore)
+    List<Integer> otherSimilarNumber = sorted.stream()
+        .filter(similarityHolder ->
+            (highestScore - similarityHolder.getScore() < 0.001d)
+                && similarityHolder.getNumbLabel() != gottenNumber)
         .map(SimilarityHolder::getNumbLabel).collect(Collectors.toList());
 
-    sorted.forEach(similarityHolder ->
+    System.out.println("Similarities");
+    sorted.stream().forEach(similarityHolder ->
         System.out.println(String
-            .format("Number %d, score %.9f",
+            .format("Number: %d, Score: %.9f. %f",
                 similarityHolder.getNumbLabel(),
-                similarityHolder.getScore())));
+                similarityHolder.getScore(),
+                highestScore - similarityHolder.getScore())));
 
-
+    digitController.getLblDigit().setText(String.valueOf(gottenNumber));
+    digitController.getLblScore().setText(String.format("Score: %.10f", highestScore));
+    digitController.getLblOtherDigits().setText(StringUtils.join(otherSimilarNumber.toArray(), ", "));
+    digitStage.showAndWait();
   }
 
   private void applyBlackWhite() {
