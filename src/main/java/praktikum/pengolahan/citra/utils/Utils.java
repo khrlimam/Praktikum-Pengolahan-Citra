@@ -5,13 +5,22 @@ import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import praktikum.pengolahan.citra.App;
 import praktikum.pengolahan.citra.processors.ColorOperation;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.FileSystems;
 
 public class Utils {
+
+  public static final String DIR_SEPARATOR = FileSystems.getDefault().getSeparator();
+  public static final String CURRENT_DIR = String.format(".%s", DIR_SEPARATOR);
+
+  public static File createModelFile() {
+    String filename = String.format("%s%s", CURRENT_DIR, Constants.MODEL_NAME);
+    return new File(filename);
+  }
 
   public static URL getUiResource(String filename) {
     return getAppResource(String.format("uis/%s", filename));
@@ -22,7 +31,7 @@ public class Utils {
   }
 
   public static URL getAppResource(String name) {
-    return App.class.getClassLoader().getResource(name);
+    return Utils.class.getResource("/" + name);
   }
 
   public static FXMLLoader loader(URL FXMLLocation) {

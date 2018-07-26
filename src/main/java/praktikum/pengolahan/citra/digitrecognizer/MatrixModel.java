@@ -4,9 +4,7 @@ import praktikum.pengolahan.citra.processors.ColorOperation;
 import praktikum.pengolahan.citra.processors.ImageProcessor;
 import praktikum.pengolahan.citra.utils.Utils;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,25 +12,21 @@ public class MatrixModel {
   private static double[][] models = null;
   public static int ROW = 10;
   public static int COLUMN = 9504;
-  private static Map<Integer, URI> modelSource;
+  private static Map<Integer, String> modelSource;
 
-  public static Map<Integer, URI> modelSource() {
+  public static Map<Integer, String> modelSource() {
     if (modelSource == null) {
       modelSource = new HashMap<>();
-      try {
-        modelSource.put(0, Utils.getAppResource("numbers/tests/0.jpeg").toURI());
-        modelSource.put(1, Utils.getAppResource("numbers/tests/1.jpeg").toURI());
-        modelSource.put(2, Utils.getAppResource("numbers/tests/2.jpeg").toURI());
-        modelSource.put(3, Utils.getAppResource("numbers/tests/3.jpeg").toURI());
-        modelSource.put(4, Utils.getAppResource("numbers/tests/4.jpeg").toURI());
-        modelSource.put(5, Utils.getAppResource("numbers/tests/5.jpeg").toURI());
-        modelSource.put(6, Utils.getAppResource("numbers/tests/6.jpeg").toURI());
-        modelSource.put(7, Utils.getAppResource("numbers/tests/7.jpeg").toURI());
-        modelSource.put(8, Utils.getAppResource("numbers/tests/8.jpeg").toURI());
-        modelSource.put(9, Utils.getAppResource("numbers/tests/9.jpeg").toURI());
-      } catch (URISyntaxException e) {
-        e.printStackTrace();
-      }
+      modelSource.put(0, Utils.getAppResource("numbers/tests/0.jpeg").getFile());
+      modelSource.put(1, Utils.getAppResource("numbers/tests/1.jpeg").getFile());
+      modelSource.put(2, Utils.getAppResource("numbers/tests/2.jpeg").getFile());
+      modelSource.put(3, Utils.getAppResource("numbers/tests/3.jpeg").getFile());
+      modelSource.put(4, Utils.getAppResource("numbers/tests/4.jpeg").getFile());
+      modelSource.put(5, Utils.getAppResource("numbers/tests/5.jpeg").getFile());
+      modelSource.put(6, Utils.getAppResource("numbers/tests/6.jpeg").getFile());
+      modelSource.put(7, Utils.getAppResource("numbers/tests/7.jpeg").getFile());
+      modelSource.put(8, Utils.getAppResource("numbers/tests/8.jpeg").getFile());
+      modelSource.put(9, Utils.getAppResource("numbers/tests/9.jpeg").getFile());
     }
     return modelSource;
   }
@@ -54,7 +48,7 @@ public class MatrixModel {
     if (models == null) {
       models = new double[ROW][COLUMN];
       for (int index = 0; index < ROW; index++) {
-        models[index] = flatten(ImageProcessor.imageToColorsDoubled(Paths.get(modelSource().get(index)).toFile()));
+        models[index] = flatten(ImageProcessor.imageToColorsDoubled(new File(modelSource().get(index))));
       }
     }
     return models;
