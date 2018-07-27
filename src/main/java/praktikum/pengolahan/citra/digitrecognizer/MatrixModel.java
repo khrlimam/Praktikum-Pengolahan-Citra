@@ -13,7 +13,7 @@ import java.util.Objects;
 public class MatrixModel {
   private static double[][] models = null;
   public static int ROW = Objects.requireNonNull(modelSource()).size();
-  public static int COLUMN = 71 * 132; // 71*132
+  public static int COLUMN = 71 * 132;
 
   public static List<ModelHolder> modelSource() {
     try {
@@ -40,7 +40,7 @@ public class MatrixModel {
     double[] flattened = new double[COLUMN];
     ColorOperation.performOperationsTo(colors, (row, column) -> {
       int index = 10 * row + column;
-      // make every pixel to grey to scattered th ecolors
+      // make every pixel to grey to scattered the colors
       double grey = (ColorOperation.getRed(colors, row, column)
           + ColorOperation.getGreen(colors, row, column)
           + ColorOperation.getBlue(colors, row, column)) / 3;
