@@ -10,5 +10,5 @@ public class Constants {
   public static final int EXPECTED_WIDTH = 71;
   public static final int EXPECTED_HEIGHT = 132;
   public static final String MODEL_NAME = "digits.space";
-
+  public static final int K = 2;
 }

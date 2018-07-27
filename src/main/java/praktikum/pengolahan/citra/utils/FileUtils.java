@@ -1,9 +1,10 @@
 package praktikum.pengolahan.citra.utils;
 
 import javafx.stage.FileChooser;
+import org.apache.commons.io.IOUtils;
 import praktikum.pengolahan.citra.App;
 
-import java.io.File;
+import java.io.*;
 
 public class FileUtils {
 
@@ -18,4 +19,18 @@ public class FileUtils {
     }
     return fileChooser.showOpenDialog(App.APP_STAGE);
   }
+
+  public static File tmpFileFromInputStream(InputStream inputStream) throws IOException {
+    final File tempFile = File.createTempFile("tmp", "img");
+    tempFile.deleteOnExit();
+    try (FileOutputStream out = new FileOutputStream(tempFile)) {
+      IOUtils.copy(inputStream, out);
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return tempFile;
+  }
+
 }

@@ -1,100 +1,88 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="386.0"
-            prefWidth="361.0" stylesheets="@main.css" xmlns="http://javafx.com/javafx/8"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="praktikum.pengolahan.citra.controllers.DigitController">
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="386.0" prefWidth="361.0" stylesheets="@main.css" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="praktikum.pengolahan.citra.controllers.DigitController">
   <children>
-    <VBox prefHeight="600.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-          AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+    <VBox prefHeight="600.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <children>
-        <AnchorPane prefHeight="600.0" styleClass="header-primary" AnchorPane.bottomAnchor="0.0"
-                    AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <AnchorPane prefHeight="600.0" styleClass="header-primary" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
           <children>
-            <Label prefHeight="200.0" prefWidth="600.0" styleClass="header-text-primary" text="Digit"
-                   AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                   AnchorPane.topAnchor="0.0">
+            <Label prefHeight="200.0" prefWidth="600.0" styleClass="header-text-primary" text="Digit" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <padding>
-                <Insets left="10.0"/>
+                <Insets left="10.0" />
               </padding>
             </Label>
           </children>
         </AnchorPane>
         <HBox prefHeight="100.0" prefWidth="200.0">
           <children>
-            <Pane prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS"/>
-            <VBox prefHeight="200.0" prefWidth="300.0">
+            <Pane prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+            <VBox minWidth="-Infinity" prefHeight="200.0" prefWidth="300.0">
               <children>
                 <AnchorPane>
                   <children>
-                    <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="15.0" prefWidth="267.0" text="Terbaca"
-                           AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                           AnchorPane.topAnchor="0.0">
+                    <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="15.0" prefWidth="267.0" text="Terbaca" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                       <font>
-                        <Font size="20.0"/>
+                        <Font size="20.0" />
                       </font>
                     </Label>
                   </children>
                 </AnchorPane>
                 <AnchorPane>
                   <children>
-                    <Label fx:id="lblDigit" alignment="CENTER" contentDisplay="CENTER" prefHeight="15.0"
-                           prefWidth="267.0" text="Label" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                           AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <Label fx:id="lblDigit" alignment="CENTER" contentDisplay="CENTER" prefHeight="15.0" prefWidth="267.0" text="Label" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                       <font>
-                        <Font name="System Bold" size="48.0"/>
+                        <Font name="System Bold" size="48.0" />
                       </font>
                     </Label>
                   </children>
                 </AnchorPane>
                 <AnchorPane>
                   <children>
-                    <Label fx:id="lblScore" alignment="CENTER" contentDisplay="CENTER" prefHeight="15.0"
-                           prefWidth="267.0" text="Score" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                           AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <Label fx:id="lblScore" alignment="CENTER" contentDisplay="CENTER" prefHeight="17.0" prefWidth="187.0" text="Score" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                       <font>
-                        <Font name="System Bold" size="15.0"/>
+                        <Font name="System Bold" size="15.0" />
                       </font>
                     </Label>
                   </children>
                 </AnchorPane>
               </children>
             </VBox>
-            <Pane prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS"/>
+            <Pane prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
           </children>
           <VBox.margin>
-            <Insets top="50.0"/>
+            <Insets top="50.0" />
           </VBox.margin>
         </HBox>
         <AnchorPane>
           <children>
-            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="19.0" prefWidth="600.0"
-                   text="Digit Lain Dengan Skor Sama" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                   AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="19.0" prefWidth="600.0" text="Digit Lain Dengan Persentase Sama" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <font>
-                <Font size="18.0"/>
+                <Font size="18.0" />
               </font>
             </Label>
           </children>
           <VBox.margin>
-            <Insets top="20.0"/>
+            <Insets top="20.0" />
           </VBox.margin>
         </AnchorPane>
         <AnchorPane>
           <children>
-            <Label fx:id="lblOtherDigits" alignment="CENTER" contentDisplay="CENTER" prefHeight="15.0" prefWidth="600.0"
-                   text="Label" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                   AnchorPane.topAnchor="0.0">
+            <Label fx:id="lblOtherDigits" alignment="CENTER" contentDisplay="CENTER" prefHeight="15.0" prefWidth="600.0" text="Label" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <font>
-                <Font name="System Bold" size="19.0"/>
+                <Font name="System Bold" size="19.0" />
               </font>
             </Label>
           </children>
           <VBox.margin>
-            <Insets top="10.0"/>
+            <Insets top="10.0" />
           </VBox.margin>
         </AnchorPane>
       </children>

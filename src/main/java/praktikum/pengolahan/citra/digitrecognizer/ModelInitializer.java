@@ -40,10 +40,10 @@ public class ModelInitializer {
   }
 
   private static void createModel() {
-    Log.i(ModelInitializer.class.getName(), "Digit space created");
     ModelInitializer.MODEL = new Matrix(MatrixModel.getModels());
-    Log.i(ModelInitializer.class.getName(), "Digit space saved to disk");
+    Log.i(ModelInitializer.class.getName(), "Digit space created");
     ModelInitializer.save(MODEL);
+    Log.i(ModelInitializer.class.getName(), "Digit space saved to disk");
   }
 
 }

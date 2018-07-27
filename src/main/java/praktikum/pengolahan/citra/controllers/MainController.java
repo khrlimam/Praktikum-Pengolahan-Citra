@@ -24,7 +24,6 @@ import praktikum.pengolahan.citra.contracts.ApplyEffect;
 import praktikum.pengolahan.citra.contracts.ApplyWithParams;
 import praktikum.pengolahan.citra.contracts.ExecutionDetail;
 import praktikum.pengolahan.citra.contracts.ReactTo;
-import praktikum.pengolahan.citra.digitrecognizer.MatrixModel;
 import praktikum.pengolahan.citra.digitrecognizer.SimilarityProcess;
 import praktikum.pengolahan.citra.digitrecognizer.pojos.SimilarityHolder;
 import praktikum.pengolahan.citra.handleres.RealImageCoordinat;
@@ -40,11 +39,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static praktikum.pengolahan.citra.digitrecognizer.MatrixModel.flatten;
 
 
 public class MainController implements Initializable, EventHandler<MouseEvent> {
@@ -163,23 +161,16 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
     List<SimilarityHolder> sorted = similarityProcess.findSimilarityAndSort(newComer);
     double highestScore = sorted.get(0).getScore();
     int gottenNumber = sorted.get(0).getNumbLabel();
-    List<Integer> otherSimilarNumber = sorted.stream()
+    Set<Integer> otherSimilarNumber = sorted.stream()
         .filter(similarityHolder ->
-            (highestScore - similarityHolder.getScore() < 0.001d)
+            (highestScore - similarityHolder.getScore() < 0.000001d)
                 && similarityHolder.getNumbLabel() != gottenNumber)
-        .map(SimilarityHolder::getNumbLabel).collect(Collectors.toList());
-
-    System.out.println("Similarities");
-    sorted.stream().forEach(similarityHolder ->
-        System.out.println(String
-            .format("Number: %d, Score: %.9f. %f",
-                similarityHolder.getNumbLabel(),
-                similarityHolder.getScore(),
-                highestScore - similarityHolder.getScore())));
+        .map(SimilarityHolder::getNumbLabel)
+        .collect(Collectors.toSet());
 
     digitController.getLblDigit().setText(String.valueOf(gottenNumber));
-    digitController.getLblScore().setText(String.format("Score: %.10f", highestScore));
-    digitController.getLblOtherDigits().setText(StringUtils.join(otherSimilarNumber.toArray(), ", "));
+    digitController.getLblScore().setText(String.format("Persentase Kemiripan: %.1f%%", highestScore * 100));
+    digitController.getLblOtherDigits().setText(StringUtils.join(otherSimilarNumber, ", "));
     digitStage.showAndWait();
   }
 
@@ -220,7 +211,7 @@ public class MainController implements Initializable, EventHandler<MouseEvent> {
       ifPictureExists = true;
       toggleEffectContainer();
       this.inputDigitImage = file;
-      newComerMatrix = MatrixModel.flatten(ImageProcessor.imageToColorsDoubled(inputDigitImage));
+      newComerMatrix = flatten(ImageProcessor.imageToColorsDoubled(inputDigitImage));
       editor = new Editor(file, waitThen());
       thread = new Thread(editor);
       thread.start();

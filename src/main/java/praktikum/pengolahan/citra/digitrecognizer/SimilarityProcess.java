@@ -3,22 +3,30 @@ package praktikum.pengolahan.citra.digitrecognizer;
 import Jama.Matrix;
 import Jama.SingularValueDecomposition;
 import praktikum.pengolahan.citra.digitrecognizer.pojos.ImageCoordinat;
+import praktikum.pengolahan.citra.digitrecognizer.pojos.ModelHolder;
 import praktikum.pengolahan.citra.digitrecognizer.pojos.SimilarityHolder;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import static praktikum.pengolahan.citra.utils.Constants.K;
 
 public class SimilarityProcess {
 
   private SingularValueDecomposition modelSVD;
-  private Matrix model, U, S, V, Vt, Uk, Sk, Vk, Vkt;
-  private static List<Integer> LABELS = new ArrayList<>(MatrixModel.modelSource().keySet());
+  private Matrix U, S, V, Vt, Uk, Sk, Vk, Vkt;
+  private static List<Integer> LABELS = new ArrayList<>(Objects.requireNonNull(MatrixModel.modelSource())
+      .stream()
+      .map(ModelHolder::getLabel)
+      .collect(Collectors.toList()));
 
   private List<ImageCoordinat> imageCoordinats;
 
   public SimilarityProcess() {
-    model = ModelInitializer.getModel().transpose();
+    Matrix model = ModelInitializer.getModel().transpose();
     modelSVD = new SingularValueDecomposition(model);
   }
 
@@ -30,9 +38,9 @@ public class SimilarityProcess {
 
   public Matrix getUk() {
     if (Uk == null) {
-      double[][] matrix = new double[getU().getRowDimension()][2];
+      double[][] matrix = new double[getU().getRowDimension()][K];
       for (int h = 0; h < getU().getRowDimension(); h++) {
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < K; i++) {
           matrix[h][i] = getU().get(h, i);
         }
       }
@@ -68,9 +76,9 @@ public class SimilarityProcess {
 
   public Matrix getVk() {
     if (Vk == null) {
-      double[][] matrix = new double[getV().getRowDimension()][2];
+      double[][] matrix = new double[getV().getRowDimension()][K];
       for (int h = 0; h < getV().getRowDimension(); h++) {
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < K; i++) {
           matrix[h][i] = getV().get(h, i);
         }
       }

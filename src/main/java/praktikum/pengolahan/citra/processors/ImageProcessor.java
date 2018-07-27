@@ -8,6 +8,7 @@ import javafx.scene.paint.Color;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 public class ImageProcessor {
 
@@ -59,6 +60,11 @@ public class ImageProcessor {
       e.printStackTrace();
     }
     return null;
+  }
+
+  public static double[][][] imageToColorsDoubled(InputStream imageFile) {
+    Image image = new Image(imageFile);
+    return imageToColorsDoubled(image);
   }
 
   public static Image colorsToImage(int[][][] colors) {

@@ -5,6 +5,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import praktikum.pengolahan.citra.App;
 import praktikum.pengolahan.citra.processors.ColorOperation;
 
 import java.io.File;
@@ -31,7 +32,7 @@ public class Utils {
   }
 
   public static URL getAppResource(String name) {
-    return Utils.class.getResource("/" + name);
+    return Utils.class.getClassLoader().getResource(name);
   }
 
   public static FXMLLoader loader(URL FXMLLocation) {
